@@ -17,6 +17,12 @@
               parent="menu_arc_dhl_root"
               sequence="10"/>
 
+    <menuitem id="menu_arc_dhl_product_rule"
+              name="DHL Product Rules"
+              action="arc_dhl_product_rule_action"
+              parent="menu_arc_dhl_root"
+              sequence="15"/>
+
     <menuitem id="menu_arc_dhl_booking"
               name="Bookings"
               action="arc_dhl_booking_action"

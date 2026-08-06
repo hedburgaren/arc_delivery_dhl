@@ -34,19 +34,23 @@ class DeliveryCarrier(models.Model):
     def dhl_freight_se_rate_shipment(self, order):
         """Return a cached price quote for the sales order."""
         self.ensure_one()
-        if not self.arc_dhl_product_id:
+        product = self.arc_dhl_product_id
+        if not product:
+            product = self.env['arc.dhl.product.selector'].select_for_order(order)
+        if not product:
             return {
                 'success': True,
                 'price': 0.0,
                 'error_message': False,
                 'warning_message': _(
-                    'No DHL product configured on the carrier; manual booking required.'
+                    'No DHL product rule matches this order; manual product '
+                    'selection required.'
                 ),
             }
         quote = self.env['arc.dhl.price.quote'].create({
             'carrier_id': self.id,
             'sale_order_id': order.id,
-            'product_id': self.arc_dhl_product_id.id,
+            'product_id': product.id,
         })
         result = quote.action_request_quote()
         return {

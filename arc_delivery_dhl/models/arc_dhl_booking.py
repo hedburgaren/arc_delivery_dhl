@@ -112,9 +112,8 @@ class ArcDhlBooking(models.Model):
             ))
 
         if not product:
-            raise UserError(_(
-                'Select a DHL product before booking.'
-            ))
+            product = self.env['arc.dhl.product.selector'].select_for_picking(picking)
+            self.product_id = product
 
         packages = self._arc_dhl_collect_packages(picking)
         if not packages:

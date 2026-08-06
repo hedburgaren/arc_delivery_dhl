@@ -22,7 +22,6 @@ class ArcDhlProductSelector(models.AbstractModel):
                 'Cannot select a DHL product for a picking with no sales order.'
             ))
 
-        country_code = self._receiver_country_code(sale_order)
         packages = self._collect_packages(sale_order)
         if not packages:
             raise UserError(_(
@@ -30,6 +29,37 @@ class ArcDhlProductSelector(models.AbstractModel):
                 'proposal first.'
             ))
 
+        country_code = self._receiver_country_code(sale_order)
+        return self.select_from_packages(packages, country_code)
+
+    @api.model
+    def select_for_order(self, sale_order):
+        """Return the first matching arc.dhl.product for a sales order."""
+        packages = self._collect_packages(sale_order)
+        if not packages:
+            return False
+
+        country_code = self._receiver_country_code(sale_order)
+        return self.select_from_packages(packages, country_code, silent=True)
+
+    @api.model
+    def select_from_packages(self, packages, country_code, silent=False):
+        """Return the first matching arc.dhl.product for a package list.
+
+        :param packages: list of dicts with keys length_cm, width_cm,
+                         height_cm, weight_kg.
+        :param country_code: two-letter receiver country code.
+        :param silent: if True, return False instead of raising when no rule
+                       matches.
+        """
+        if not packages:
+            if silent:
+                return False
+            raise UserError(_(
+                'No packages found to select a DHL product.'
+            ))
+
+        country_code = (country_code or 'SE').upper()
         max_length_cm = max(p['length_cm'] for p in packages)
         total_weight_kg = sum(p['weight_kg'] for p in packages)
         package_count = len(packages)
@@ -41,6 +71,8 @@ class ArcDhlProductSelector(models.AbstractModel):
             if rule.matches(country_code, max_length_cm, total_weight_kg, package_count):
                 return rule.product_id
 
+        if silent:
+            return False
         raise UserError(_(
             'No DHL product rule matches the shipment: country %(country)s, '
             'max length %(length)s cm, weight %(weight)s kg, packages %(count)s.',
@@ -49,26 +81,6 @@ class ArcDhlProductSelector(models.AbstractModel):
             weight=round(total_weight_kg, 2),
             count=package_count,
         ))
-
-    @api.model
-    def select_for_order(self, sale_order):
-        """Return the first matching arc.dhl.product for a sales order."""
-        country_code = self._receiver_country_code(sale_order)
-        packages = self._collect_packages(sale_order)
-        if not packages:
-            return False
-
-        max_length_cm = max(p['length_cm'] for p in packages)
-        total_weight_kg = sum(p['weight_kg'] for p in packages)
-        package_count = len(packages)
-
-        rules = self.env['arc.dhl.product.rule'].search([
-            ('active', '=', True),
-        ], order='sequence')
-        for rule in rules:
-            if rule.matches(country_code, max_length_cm, total_weight_kg, package_count):
-                return rule.product_id
-        return False
 
     @api.model
     def _receiver_country_code(self, sale_order):
@@ -80,7 +92,7 @@ class ArcDhlProductSelector(models.AbstractModel):
         """Collect package dimensions and weights from WP2 proposal or fallback."""
         proposal = self.env['arc.package.proposal'].search([
             ('sale_order_id', '=', sale_order.id),
-            ('state', '=', 'confirmed'),
+            ('state', 'in', ('draft', 'confirmed')),
         ], limit=1, order='create_date desc')
 
         packages = []

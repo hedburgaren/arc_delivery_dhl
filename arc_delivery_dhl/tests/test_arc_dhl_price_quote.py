@@ -79,3 +79,44 @@ class TestArcDhlPriceQuote(TransactionCase):
         self.assertTrue(res2['success'])
         self.assertEqual(res2['price'], 150.0)
         self.assertEqual(mock_request.call_count, 1)
+
+    @patch('requests.request')
+    def test_quote_for_packages_without_sale_order(self, mock_request):
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.ok = True
+        mock_request.return_value.json.return_value = {'price': 199.0}
+        mock_request.return_value.text = ''
+
+        packages = [{
+            'length_cm': 50.0,
+            'width_cm': 30.0,
+            'height_cm': 10.0,
+            'weight_kg': 5.0,
+        }]
+        result = self.env['arc.dhl.price.quote'].get_quote_for_packages(
+            packages, {'country_code': 'SE', 'zip': '58118'},
+        )
+        self.assertTrue(result['success'])
+        self.assertEqual(result['price'], 199.0)
+        self.assertEqual(mock_request.call_count, 1)
+
+    @patch('requests.request')
+    def test_quote_for_packages_uses_cache(self, mock_request):
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.ok = True
+        mock_request.return_value.json.return_value = {'price': 250.0}
+        mock_request.return_value.text = ''
+
+        packages = [{
+            'length_cm': 50.0,
+            'width_cm': 30.0,
+            'height_cm': 10.0,
+            'weight_kg': 5.0,
+        }]
+        self.env['arc.dhl.price.quote'].get_quote_for_packages(
+            packages, {'country_code': 'SE', 'zip': '58118'},
+        )
+        self.env['arc.dhl.price.quote'].get_quote_for_packages(
+            packages, {'country_code': 'SE', 'zip': '58118'},
+        )
+        self.assertEqual(mock_request.call_count, 1)

@@ -18,13 +18,12 @@ class ArcDhlPriceQuote(models.Model):
     carrier_id = fields.Many2one(
         'delivery.carrier',
         string='Carrier',
-        required=True,
+        required=False,
         ondelete='restrict',
     )
     sale_order_id = fields.Many2one(
         'sale.order',
         string='Sales Order',
-        required=True,
         ondelete='cascade',
         index=True,
     )
@@ -33,6 +32,16 @@ class ArcDhlPriceQuote(models.Model):
         string='DHL product',
         required=True,
         ondelete='restrict',
+    )
+    partner_country_code = fields.Char(
+        string='Receiver country',
+        size=2,
+        default='SE',
+    )
+    partner_zip = fields.Char(string='Receiver ZIP')
+    package_json = fields.Text(
+        string='Packages (JSON)',
+        help='JSON list of packages used when no sales order is linked.',
     )
     state = fields.Selection(
         [('draft', 'Draft'),
@@ -115,18 +124,78 @@ class ArcDhlPriceQuote(models.Model):
             'warning_message': False,
         }
 
+    @api.model
+    def get_quote_for_packages(self, packages, partner_vals, product=None):
+        """Request a DHL price quote for a raw package list.
+
+        :param packages: list of dicts with length_cm, width_cm, height_cm,
+                         weight_kg.
+        :param partner_vals: dict with country_code and zip.
+        :param product: optional arc.dhl.product record; if not provided the
+                        first matching rule is used.
+        :return: dict with success, price, error_message as returned by
+                 action_request_quote.
+        """
+        country_code = (partner_vals.get('country_code') or 'SE').upper()
+        zip_code = partner_vals.get('zip') or ''
+
+        if not product:
+            product = self.env['arc.dhl.product.selector'].select_from_packages(
+                packages, country_code, silent=True,
+            )
+        if not product:
+            return {
+                'success': False,
+                'price': 0.0,
+                'error_message': _(
+                    'No DHL product rule matches the shipment.'
+                ),
+            }
+
+        carrier = self.env['delivery.carrier'].sudo().search([
+            ('delivery_type', '=', 'dhl_freight_se'),
+        ], limit=1)
+        package_list = [
+            {
+                'length': max(p.get('length_cm', 1), 1),
+                'width': max(p.get('width_cm', 1), 1),
+                'height': max(p.get('height_cm', 1), 1),
+                'weight': max(p.get('weight_kg', 0.001), 0.001),
+            }
+            for p in packages
+        ]
+        quote = self.create({
+            'carrier_id': carrier.id if carrier else False,
+            'product_id': product.id,
+            'partner_country_code': country_code,
+            'partner_zip': zip_code,
+            'package_json': json.dumps(package_list),
+        })
+        return quote.action_request_quote()
+
     def _arc_dhl_quote_cache_key(self):
         """Build a deterministic cache key from the quote inputs."""
         self.ensure_one()
-        order = self.sale_order_id
-        partner = order.partner_shipping_id or order.partner_id
-        parts = [
-            str(self.product_id.id),
-            partner.country_id.code or 'SE',
-            partner.zip or '',
-            str(round(order.arc_chargeable_weight_kg or 0.0, 2)),
-            str(int(order.arc_package_count or 0)),
-        ]
+        if self.sale_order_id:
+            order = self.sale_order_id
+            partner = order.partner_shipping_id or order.partner_id
+            packages = self._arc_dhl_collect_packages_from_order()
+            parts = [
+                str(self.product_id.id),
+                partner.country_id.code or 'SE',
+                partner.zip or '',
+                str(round(order.arc_chargeable_weight_kg or 0.0, 2)),
+                str(int(order.arc_package_count or 0)),
+            ]
+        else:
+            packages = self._arc_dhl_collect_packages_from_json()
+            parts = [
+                str(self.product_id.id),
+                self.partner_country_code or 'SE',
+                self.partner_zip or '',
+                str(round(sum(p['weight'] for p in packages), 2)),
+                str(len(packages)),
+            ]
         return hash(tuple(parts))
 
     def _cache_ttl(self):
@@ -140,12 +209,34 @@ class ArcDhlPriceQuote(models.Model):
 
     def _arc_dhl_build_quote_payload(self):
         """Build a PriceQuote payload."""
+        if self.sale_order_id:
+            order = self.sale_order_id
+            partner = order.partner_shipping_id or order.partner_id
+            country_code = partner.country_id.code or 'SE'
+            zip_code = partner.zip or ''
+            packages = self._arc_dhl_collect_packages_from_order()
+        else:
+            country_code = self.partner_country_code or 'SE'
+            zip_code = self.partner_zip or ''
+            packages = self._arc_dhl_collect_packages_from_json()
+
+        return {
+            'productCode': self.product_id.code,
+            'receiver': {
+                'countryCode': country_code,
+                'postalCode': zip_code,
+            },
+            'packages': packages or [{'weight': 1.0}],
+        }
+
+    def _arc_dhl_collect_packages_from_order(self):
+        """Collect packages from the linked sale order's proposal."""
+        self.ensure_one()
         order = self.sale_order_id
-        partner = order.partner_shipping_id or order.partner_id
         packages = []
         proposal = self.env['arc.package.proposal'].search([
             ('sale_order_id', '=', order.id),
-            ('state', '=', 'confirmed'),
+            ('state', 'in', ('draft', 'confirmed')),
         ], limit=1, order='create_date desc')
         if proposal:
             for line in proposal.line_ids:
@@ -157,14 +248,17 @@ class ArcDhlPriceQuote(models.Model):
                         'weight': line.chargeable_weight_kg
                                   / max(line.package_qty, 1),
                     })
-        return {
-            'productCode': self.product_id.code,
-            'receiver': {
-                'countryCode': partner.country_id.code or 'SE',
-                'postalCode': partner.zip or '',
-            },
-            'packages': packages or [{'weight': 1.0}],
-        }
+        return packages
+
+    def _arc_dhl_collect_packages_from_json(self):
+        """Collect packages from the stored package_json field."""
+        self.ensure_one()
+        if not self.package_json:
+            return []
+        try:
+            return json.loads(self.package_json)
+        except ValueError:
+            return []
 
     def _arc_dhl_extract_price(self, response):
         """Extract the price from a DHL PriceQuote response."""

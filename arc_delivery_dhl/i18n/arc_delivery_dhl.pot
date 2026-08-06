@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0-20260513\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-06 16:00+0000\n"
-"PO-Revision-Date: 2026-08-06 16:00+0000\n"
+"POT-Creation-Date: 2026-08-06 16:52+0000\n"
+"PO-Revision-Date: 2026-08-06 16:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,12 @@ msgstr ""
 #. module: arc_delivery_dhl
 #: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.res_config_settings_view_form_arc_dhl
 msgid "<span class=\"o_form_label\">DHL Freight Sweden</span>"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_product_rule.py:0
+msgid "A rule must match domestic, international, or both."
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -53,6 +59,7 @@ msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__active
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__active
 msgid "Active"
 msgstr ""
 
@@ -61,6 +68,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__assigned_attachment_ids
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__assigned_attachment_ids
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_selector__assigned_attachment_ids
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_request_mixin__assigned_attachment_ids
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_delivery_carrier__assigned_attachment_ids
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__assigned_attachment_ids
@@ -124,9 +133,20 @@ msgid "Cannot cancel a shipment that has no tracking reference."
 msgstr ""
 
 #. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_product_selector.py:0
+msgid "Cannot select a DHL product for a picking with no sales order."
+msgstr ""
+
+#. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__carrier_id
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__carrier_id
 msgid "Carrier"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product.rule,note:arc_delivery_dhl.dhl_product_rule_special
+msgid "Catch-all for anything outside standard products. Requires agreement."
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -144,6 +164,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__create_uid
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__create_uid
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__create_uid
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__create_uid
 msgid "Created by"
 msgstr ""
 
@@ -152,6 +173,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__create_date
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__create_date
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__create_date
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__create_date
 msgid "Created on"
 msgstr ""
 
@@ -247,16 +269,19 @@ msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_paket
+#: model:arc.dhl.product.rule,name:arc_delivery_dhl.dhl_product_rule_paket
 msgid "DHL PAKET"
 msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_pall
+#: model:arc.dhl.product.rule,name:arc_delivery_dhl.dhl_product_rule_pall
 msgid "DHL PALL"
 msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_parti
+#: model:arc.dhl.product.rule,name:arc_delivery_dhl.dhl_product_rule_parti
 msgid "DHL PARTI"
 msgstr ""
 
@@ -272,6 +297,18 @@ msgid "DHL Price Quotes"
 msgstr ""
 
 #. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_product_rule_form_view
+msgid "DHL Product Rule"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.actions.act_window,name:arc_delivery_dhl.arc_dhl_product_rule_action
+#: model:ir.ui.menu,name:arc_delivery_dhl.menu_arc_dhl_product_rule
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_product_rule_list_view
+msgid "DHL Product Rules"
+msgstr ""
+
+#. module: arc_delivery_dhl
 #: model:ir.actions.act_window,name:arc_delivery_dhl.arc_dhl_product_action
 #: model:ir.ui.menu,name:arc_delivery_dhl.menu_arc_dhl_product
 msgid "DHL Products"
@@ -284,21 +321,25 @@ msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_road_priority
+#: model:arc.dhl.product.rule,name:arc_delivery_dhl.dhl_product_rule_road_priority
 msgid "DHL Road Freight Priority"
 msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_road_standard
+#: model:arc.dhl.product.rule,name:arc_delivery_dhl.dhl_product_rule_road_standard
 msgid "DHL Road Freight Standard"
 msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_special
+#: model:arc.dhl.product.rule,name:arc_delivery_dhl.dhl_product_rule_special
 msgid "DHL SPECIAL"
 msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_stycke
+#: model:arc.dhl.product.rule,name:arc_delivery_dhl.dhl_product_rule_stycke
 msgid "DHL STYCKE"
 msgstr ""
 
@@ -331,6 +372,7 @@ msgstr ""
 #. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__product_id
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__product_id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__product_id
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_delivery_carrier__arc_dhl_product_id
 msgid "DHL product"
 msgstr ""
@@ -338,6 +380,16 @@ msgstr ""
 #. module: arc_delivery_dhl
 #: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__code
 msgid "DHL product code used in API payloads, e.g. 210, 211."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_product_rule
+msgid "DHL product selection rule"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_product_selector
+msgid "DHL product selector"
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -392,7 +444,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__display_name
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__display_name
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__display_name
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__is_domestic
+msgid "Domestic"
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -464,6 +522,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__id
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__id
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__id
 msgid "ID"
 msgstr ""
 
@@ -476,6 +535,11 @@ msgstr ""
 #: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_booking__message_has_error
 #: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_booking__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__is_international
+msgid "International"
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -515,6 +579,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__write_uid
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__write_uid
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__write_uid
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__write_uid
 msgid "Last Updated by"
 msgstr ""
 
@@ -523,17 +588,55 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__write_date
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__write_date
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__write_date
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__write_date
 msgid "Last Updated on"
 msgstr ""
 
 #. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_product_rule_form_view
+msgid "Limits"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product_rule__is_domestic
+msgid "Matches shipments where the receiver country is SE."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product_rule__is_international
+msgid "Matches shipments where the receiver country is not SE."
+msgstr ""
+
+#. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__max_length_cm
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__max_length_cm
 msgid "Max length (cm)"
 msgstr ""
 
 #. module: arc_delivery_dhl
+#: model:ir.model.constraint,message:arc_delivery_dhl.constraint_arc_dhl_product_rule_check_length
+msgid "Max length must be greater than or equal to min length."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.constraint,message:arc_delivery_dhl.constraint_arc_dhl_product_rule_check_count
+msgid "Max package count must be greater than or equal to min package count."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__max_package_count
+msgid "Max packages"
+msgstr ""
+
+#. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__max_weight_kg
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__max_weight_kg
 msgid "Max weight (kg)"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.constraint,message:arc_delivery_dhl.constraint_arc_dhl_product_rule_check_weight
+msgid "Max weight must be greater than or equal to min weight."
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -547,14 +650,39 @@ msgid "Messages"
 msgstr ""
 
 #. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__min_length_cm
+msgid "Min length (cm)"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__min_package_count
+msgid "Min packages"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__min_weight_kg
+msgid "Min weight (kg)"
+msgstr ""
+
+#. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__name
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__name
 msgid "Name"
 msgstr ""
 
 #. module: arc_delivery_dhl
 #. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_product_selector.py:0
+msgid ""
+"No DHL product rule matches the shipment: country %(country)s, max length "
+"%(length)s cm, weight %(weight)s kg, packages %(count)s."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
 #: code:addons/arc_delivery_dhl/models/delivery_carrier.py:0
-msgid "No DHL product configured on the carrier; manual booking required."
+msgid ""
+"No DHL product rule matches this order; manual product selection required."
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -566,7 +694,15 @@ msgid ""
 msgstr ""
 
 #. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_product_selector.py:0
+msgid ""
+"No packages found to select a DHL product. Create a packing proposal first."
+msgstr ""
+
+#. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__note
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__note
 msgid "Note"
 msgstr ""
 
@@ -744,9 +880,13 @@ msgid "Sandbox"
 msgstr ""
 
 #. module: arc_delivery_dhl
-#. odoo-python
-#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
-msgid "Select a DHL product before booking."
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_product_rule_form_view
+msgid "Scope"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__sequence
+msgid "Sequence"
 msgstr ""
 
 #. module: arc_delivery_dhl

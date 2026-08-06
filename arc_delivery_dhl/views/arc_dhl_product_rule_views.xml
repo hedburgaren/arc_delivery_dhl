@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="arc_dhl_product_rule_list_view" model="ir.ui.view">
+        <field name="name">arc.dhl.product.rule.list</field>
+        <field name="model">arc.dhl.product.rule</field>
+        <field name="arch" type="xml">
+            <list string="DHL Product Rules" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="is_domestic"/>
+                <field name="is_international"/>
+                <field name="max_length_cm"/>
+                <field name="max_weight_kg"/>
+                <field name="max_package_count"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="arc_dhl_product_rule_form_view" model="ir.ui.view">
+        <field name="name">arc.dhl.product.rule.form</field>
+        <field name="model">arc.dhl.product.rule</field>
+        <field name="arch" type="xml">
+            <form string="DHL Product Rule">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                        <field name="product_id"/>
+                    </group>
+                    <group string="Scope">
+                        <field name="is_domestic"/>
+                        <field name="is_international"/>
+                    </group>
+                    <group string="Limits">
+                        <field name="min_length_cm"/>
+                        <field name="max_length_cm"/>
+                        <field name="min_weight_kg"/>
+                        <field name="max_weight_kg"/>
+                        <field name="min_package_count"/>
+                        <field name="max_package_count"/>
+                    </group>
+                    <field name="note"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="arc_dhl_product_rule_action" model="ir.actions.act_window">
+        <field name="name">DHL Product Rules</field>
+        <field name="res_model">arc.dhl.product.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

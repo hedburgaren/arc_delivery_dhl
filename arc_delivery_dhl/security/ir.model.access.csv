@@ -1,6 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_arc_dhl_product_user,arc.dhl.product.user,model_arc_dhl_product,base.group_user,1,0,0,0
 access_arc_dhl_product_manager,arc.dhl.product.manager,model_arc_dhl_product,base.group_system,1,1,1,1
+access_arc_dhl_product_rule_user,arc.dhl.product.rule.user,model_arc_dhl_product_rule,base.group_user,1,0,0,0
+access_arc_dhl_product_rule_manager,arc.dhl.product.rule.manager,model_arc_dhl_product_rule,base.group_system,1,1,1,1
 access_arc_dhl_booking_user,arc.dhl.booking.user,model_arc_dhl_booking,stock.group_stock_user,1,1,1,0
 access_arc_dhl_booking_manager,arc.dhl.booking.manager,model_arc_dhl_booking,stock.group_stock_manager,1,1,1,1
 access_arc_dhl_label_user,arc.dhl.label.user,model_arc_dhl_label,stock.group_stock_user,1,1,1,0

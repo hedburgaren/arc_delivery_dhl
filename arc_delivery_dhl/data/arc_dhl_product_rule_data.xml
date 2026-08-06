@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!-- DHL product selection rules.
+         Rules are evaluated in sequence order; the first matching rule wins.
+         Calibrate weights and dimensions in the UI. -->
+
+    <record id="dhl_product_rule_paket" model="arc.dhl.product.rule">
+        <field name="name">DHL PAKET</field>
+        <field name="sequence">10</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">150</field>
+        <field name="max_weight_kg">35</field>
+        <field name="max_package_count">99</field>
+        <field name="product_id" ref="arc_delivery_dhl.dhl_product_paket"/>
+    </record>
+
+    <record id="dhl_product_rule_pall" model="arc.dhl.product.rule">
+        <field name="name">DHL PALL</field>
+        <field name="sequence">20</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">120</field>
+        <field name="max_weight_kg">800</field>
+        <field name="max_package_count">99</field>
+        <field name="product_id" ref="arc_delivery_dhl.dhl_product_pall"/>
+    </record>
+
+    <record id="dhl_product_rule_stycke" model="arc.dhl.product.rule">
+        <field name="name">DHL STYCKE</field>
+        <field name="sequence">30</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">599</field>
+        <field name="max_weight_kg">1000</field>
+        <field name="max_package_count">99</field>
+        <field name="product_id" ref="arc_delivery_dhl.dhl_product_stycke"/>
+    </record>
+
+    <record id="dhl_product_rule_parti" model="arc.dhl.product.rule">
+        <field name="name">DHL PARTI</field>
+        <field name="sequence">40</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">1200</field>
+        <field name="max_weight_kg">2500</field>
+        <field name="max_package_count">99</field>
+        <field name="product_id" ref="arc_delivery_dhl.dhl_product_parti"/>
+    </record>
+
+    <record id="dhl_product_rule_road_standard" model="arc.dhl.product.rule">
+        <field name="name">DHL Road Freight Standard</field>
+        <field name="sequence">50</field>
+        <field name="is_domestic" eval="False"/>
+        <field name="is_international" eval="True"/>
+        <field name="max_length_cm">299</field>
+        <field name="max_weight_kg">2500</field>
+        <field name="max_package_count">99</field>
+        <field name="product_id" ref="arc_delivery_dhl.dhl_product_road_standard"/>
+    </record>
+
+    <record id="dhl_product_rule_road_priority" model="arc.dhl.product.rule">
+        <field name="name">DHL Road Freight Priority</field>
+        <field name="sequence">60</field>
+        <field name="is_domestic" eval="False"/>
+        <field name="is_international" eval="True"/>
+        <field name="max_length_cm">299</field>
+        <field name="max_weight_kg">2500</field>
+        <field name="max_package_count">99</field>
+        <field name="product_id" ref="arc_delivery_dhl.dhl_product_road_priority"/>
+    </record>
+
+    <record id="dhl_product_rule_special" model="arc.dhl.product.rule">
+        <field name="name">DHL SPECIAL</field>
+        <field name="sequence">100</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="True"/>
+        <field name="max_length_cm">0</field>
+        <field name="max_weight_kg">0</field>
+        <field name="max_package_count">0</field>
+        <field name="product_id" ref="arc_delivery_dhl.dhl_product_special"/>
+        <field name="note">Catch-all for anything outside standard products. Requires agreement.</field>
+    </record>
+</odoo>

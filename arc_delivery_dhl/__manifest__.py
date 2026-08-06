@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ARC Delivery DHL',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'author': 'ARC Gruppen AB',
     'maintainer': 'Chrille Hedberg',
     'maintainer_email': 'chrille.hedberg@arcgruppen.se',
@@ -35,10 +35,12 @@ DHL Freight APIs on developer.dhl.com.
         'security/ir.model.access.csv',
         'data/arc_dhl_sequence_data.xml',
         'data/arc_dhl_product_data.xml',
+        'data/arc_dhl_product_rule_data.xml',
         'data/arc_dhl_parameter_data.xml',
         'views/delivery_carrier_views.xml',
         'views/res_config_settings_views.xml',
         'views/stock_picking_views.xml',
+        'views/arc_dhl_product_rule_views.xml',
         'views/arc_dhl_booking_views.xml',
         'views/arc_dhl_label_views.xml',
         'views/arc_dhl_price_quote_views.xml',

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Domestic Sweden products -->
+    <record id="dhl_product_paket" model="arc.dhl.product">
+        <field name="name">DHL PAKET</field>
+        <field name="code">102</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">150</field>
+        <field name="max_weight_kg">35</field>
+        <field name="is_pallet_product" eval="False"/>
+    </record>
+
+    <record id="dhl_product_pall" model="arc.dhl.product">
+        <field name="name">DHL PALL</field>
+        <field name="code">210</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">120</field>
+        <field name="max_weight_kg">800</field>
+        <field name="is_pallet_product" eval="True"/>
+    </record>
+
+    <record id="dhl_product_stycke" model="arc.dhl.product">
+        <field name="name">DHL STYCKE</field>
+        <field name="code">211</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">599</field>
+        <field name="max_weight_kg">1000</field>
+        <field name="is_pallet_product" eval="False"/>
+    </record>
+
+    <record id="dhl_product_parti" model="arc.dhl.product">
+        <field name="name">DHL PARTI</field>
+        <field name="code">212</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">1200</field>
+        <field name="max_weight_kg">2500</field>
+        <field name="is_pallet_product" eval="False"/>
+    </record>
+
+    <record id="dhl_product_special" model="arc.dhl.product">
+        <field name="name">DHL SPECIAL</field>
+        <field name="code">209</field>
+        <field name="is_domestic" eval="True"/>
+        <field name="is_international" eval="False"/>
+        <field name="max_length_cm">0</field>
+        <field name="max_weight_kg">0</field>
+        <field name="is_pallet_product" eval="False"/>
+        <field name="note">Requires separate agreement.</field>
+    </record>
+
+    <!-- International road products -->
+    <record id="dhl_product_road_standard" model="arc.dhl.product">
+        <field name="name">DHL Road Freight Standard</field>
+        <field name="code">202</field>
+        <field name="is_domestic" eval="False"/>
+        <field name="is_international" eval="True"/>
+        <field name="max_length_cm">299</field>
+        <field name="max_weight_kg">0</field>
+        <field name="is_pallet_product" eval="False"/>
+    </record>
+
+    <record id="dhl_product_road_priority" model="arc.dhl.product">
+        <field name="name">DHL Road Freight Priority</field>
+        <field name="code">233</field>
+        <field name="is_domestic" eval="False"/>
+        <field name="is_international" eval="True"/>
+        <field name="max_length_cm">299</field>
+        <field name="max_weight_kg">0</field>
+        <field name="is_pallet_product" eval="False"/>
+    </record>
+
+    <record id="dhl_product_road_direct" model="arc.dhl.product">
+        <field name="name">DHL Road Freight Direct</field>
+        <field name="code">205</field>
+        <field name="is_domestic" eval="False"/>
+        <field name="is_international" eval="True"/>
+        <field name="max_length_cm">0</field>
+        <field name="max_weight_kg">0</field>
+        <field name="is_pallet_product" eval="False"/>
+        <field name="note">Direct and full loads.</field>
+    </record>
+</odoo>

@@ -1,0 +1,832 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* arc_delivery_dhl
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0-20260513\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-06 16:00+0000\n"
+"PO-Revision-Date: 2026-08-06 16:00+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: sv\n"
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.res_config_settings_view_form_arc_dhl
+msgid "<span class=\"o_form_label\">DHL Freight Sweden</span>"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_booking_form_view
+msgid "API"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_price_quote_form_view
+msgid "API Response"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_api_key
+msgid "API key for DHL Freight Sweden API Farm. Stored in Odoo settings."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__api_response
+msgid "API response"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__active
+msgid "Active"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_request_mixin__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_delivery_carrier__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__assigned_attachment_ids
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_stock_picking__assigned_attachment_ids
+msgid "Assigned Attachments"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/delivery_carrier.py:0
+msgid ""
+"Automatic DHL cancellation is not implemented. Cancel the shipment in "
+"myDHLFreight and clear the tracking reference here."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_booking_form_view
+msgid "Book Shipment"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dhl_booking__state__booked
+msgid "Booked"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__booking_id
+msgid "Booking"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/delivery_carrier.py:0
+msgid "Booking failed."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.ui.menu,name:arc_delivery_dhl.menu_arc_dhl_booking
+msgid "Bookings"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__cache_key
+msgid "Cache key"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dhl_booking__state__cancelled
+msgid "Cancelled"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/delivery_carrier.py:0
+msgid "Cannot cancel a shipment that has no tracking reference."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__carrier_id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__carrier_id
+msgid "Carrier"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.res_config_settings_view_form_arc_dhl
+msgid "Configure the DHL Freight Sweden API Farm integration."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__create_uid
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__create_uid
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__create_uid
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__create_date
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__create_date
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__create_date
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__currency_id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.ui.menu,name:arc_delivery_dhl.menu_arc_dhl_root
+msgid "DHL"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_api_key
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_api_key
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_api_key
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_api_key
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_api_key
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_api_key
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__arc_dhl_api_key
+msgid "DHL API key"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_request_mixin.py:0
+msgid ""
+"DHL API key is not configured. Set it in Settings > DHL Delivery or define "
+"the DHL_API_KEY environment variable."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_request_mixin.py:0
+msgid ""
+"DHL API request failed. Check the network and try again, or use the manual "
+"fallback and paste the tracking reference."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_request_mixin
+msgid "DHL API request mixin"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_request_mixin.py:0
+msgid ""
+"DHL API request timed out. Try again or use the manual fallback and paste "
+"the tracking reference into the picking."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_request_mixin.py:0
+msgid "DHL API returned error %(status)s: %(message)s"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_booking_form_view
+msgid "DHL Booking"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.actions.act_window,name:arc_delivery_dhl.arc_dhl_booking_action
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_booking_list_view
+msgid "DHL Bookings"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__delivery_carrier__delivery_type__dhl_freight_se
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.view_delivery_carrier_form_arc_dhl
+msgid "DHL Freight Sweden"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_product
+msgid "DHL Freight Sweden product"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_label_form_view
+msgid "DHL Label"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.actions.act_window,name:arc_delivery_dhl.arc_dhl_label_action
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_label_list_view
+msgid "DHL Labels"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_paket
+msgid "DHL PAKET"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_pall
+msgid "DHL PALL"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_parti
+msgid "DHL PARTI"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_price_quote_form_view
+msgid "DHL Price Quote"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.actions.act_window,name:arc_delivery_dhl.arc_dhl_price_quote_action
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_price_quote_list_view
+msgid "DHL Price Quotes"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.actions.act_window,name:arc_delivery_dhl.arc_dhl_product_action
+#: model:ir.ui.menu,name:arc_delivery_dhl.menu_arc_dhl_product
+msgid "DHL Products"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_road_direct
+msgid "DHL Road Freight Direct"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_road_priority
+msgid "DHL Road Freight Priority"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_road_standard
+msgid "DHL Road Freight Standard"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_special
+msgid "DHL SPECIAL"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,name:arc_delivery_dhl.dhl_product_stycke
+msgid "DHL STYCKE"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__dhl_booking_id
+msgid "DHL booking ID"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_stock_picking__arc_dhl_booking_ids
+msgid "DHL bookings"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_stock_picking__arc_dhl_label_count
+msgid "DHL labels"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_price_quote
+msgid "DHL price quote"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid "DHL print response contained no documents."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__product_id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__product_id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_delivery_carrier__arc_dhl_product_id
+msgid "DHL product"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__code
+msgid "DHL product code used in API payloads, e.g. 210, 211."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_is_production
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_is_production
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_is_production
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_is_production
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_is_production
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_is_production
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__arc_dhl_is_production
+msgid "DHL production environment"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid "DHL response did not contain a booking identifier."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_delivery_carrier__arc_dhl_service_text
+msgid "DHL service text"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_booking
+msgid "DHL shipment booking"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_label
+msgid "DHL shipping label"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_delivery_carrier__arc_dhl_default_sender_reference
+msgid "Default reference shown on the DHL label."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_delivery_carrier__arc_dhl_default_sender_reference
+msgid "Default sender reference"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,note:arc_delivery_dhl.dhl_product_road_direct
+msgid "Direct and full loads."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__display_name
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__display_name
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__display_name
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__is_domestic
+msgid "Domestic Sweden"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dhl_booking__state__draft
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dhl_price_quote__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dhl_booking__state__error
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dhl_price_quote__state__error
+msgid "Error"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__error_message
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__error_message
+msgid "Error message"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__label_file
+msgid "File reference"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__name
+msgid "Filename"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_force_environment
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_force_environment
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_force_environment
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_force_environment
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_force_environment
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_force_environment
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__arc_dhl_force_environment
+msgid "Force DHL environment"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_stock_picking__arc_dhl_freight_stale
+msgid "Freight stale"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__id
+msgid "ID"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_booking__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_booking__message_has_error
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_booking__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__is_international
+msgid "International road"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__label_data
+msgid "Label PDF"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__label_ids
+#: model:ir.ui.menu,name:arc_delivery_dhl.menu_arc_dhl_label
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_booking_form_view
+msgid "Labels"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__api_request
+msgid "Last API request"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__api_response
+msgid "Last API response"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__write_uid
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__write_uid
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__write_uid
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__write_date
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__write_date
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__write_date
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__max_length_cm
+msgid "Max length (cm)"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__max_weight_kg
+msgid "Max weight (kg)"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__name
+msgid "Name"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/delivery_carrier.py:0
+msgid "No DHL product configured on the carrier; manual booking required."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid ""
+"No packages found for this picking. Create packages first or use the packing "
+"planner."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__note
+msgid "Note"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_booking__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_booking__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_delivery_carrier__arc_dhl_service_text
+msgid "Optional service text included in the booking payload."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_force_environment
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_force_environment
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_force_environment
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_force_environment
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_force_environment
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_force_environment
+#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_force_environment
+msgid ""
+"Overrides the production flag for testing. Clear to use the production flag "
+"normally."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid "Package %(index)s exceeds the %(product)s length limit of %(limit)s cm."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid "Package %(index)s exceeds the %(product)s weight limit of %(limit)s kg."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__is_pallet_product
+msgid "Pallet product"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__is_pallet_product
+msgid "Pallet products are priced by pallet count, not by weight."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__picking_id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__picking_id
+msgid "Picking"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__price
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__price
+msgid "Price"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.ui.menu,name:arc_delivery_dhl.menu_arc_dhl_price_quote
+msgid "Price Quotes"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__code
+msgid "Product code"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.constraint,message:arc_delivery_dhl.constraint_arc_dhl_product_unique_code
+msgid "Product code must be unique."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_delivery_carrier__arc_dhl_product_id
+msgid "Product code sent to DHL. Leave empty to select manually at booking."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_b2b_mode_settings__arc_dhl_force_environment__production
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_b2b_order_workflow_settings__arc_dhl_force_environment__production
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_catalogue_creator_settings__arc_dhl_force_environment__production
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_cpp_settings__arc_dhl_force_environment__production
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dashboard_widget_settings__arc_dhl_force_environment__production
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_tech_settings__arc_dhl_force_environment__production
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__res_config_settings__arc_dhl_force_environment__production
+msgid "Production"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_delivery_carrier__delivery_type
+msgid "Provider"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__max_length_cm
+msgid "Published length limit. Zero means no hard limit configured."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__max_weight_kg
+msgid "Published weight limit per piece. Zero means no hard limit."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dhl_price_quote__state__quoted
+msgid "Quoted"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__name
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__name
+msgid "Reference"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_price_quote_form_view
+msgid "Request Quote"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:arc.dhl.product,note:arc_delivery_dhl.dhl_product_special
+msgid "Requires separate agreement."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_booking_form_view
+msgid "Reset to Draft"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__sale_order_id
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__sale_order_id
+msgid "Sales Order"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_b2b_mode_settings__arc_dhl_force_environment__sandbox
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_b2b_order_workflow_settings__arc_dhl_force_environment__sandbox
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_catalogue_creator_settings__arc_dhl_force_environment__sandbox
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_cpp_settings__arc_dhl_force_environment__sandbox
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_dashboard_widget_settings__arc_dhl_force_environment__sandbox
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__arc_tech_settings__arc_dhl_force_environment__sandbox
+#: model:ir.model.fields.selection,name:arc_delivery_dhl.selection__res_config_settings__arc_dhl_force_environment__sandbox
+msgid "Sandbox"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid "Select a DHL product before booking."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_stock_picking__arc_dhl_freight_stale
+msgid "Set when order lines change after the delivery line was added."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_delivery_carrier
+msgid "Shipping Methods"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__state
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__state
+msgid "Status"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid "The carrier is not configured for DHL Freight Sweden."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid "The delivery address is missing on the picking."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.view_picking_form_arc_dhl
+msgid ""
+"The freight calculation is stale because the order has changed after the "
+"delivery line was added. Recalculate or rebook freight."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_label__tracking_number
+msgid "Tracking number"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__dhl_tracking_numbers
+msgid "Tracking numbers"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model,name:arc_delivery_dhl.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__is_international
+msgid "True for international road freight products."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__is_domestic
+msgid "True for products available within Sweden."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_booking__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_is_production
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_is_production
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_is_production
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_is_production
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_is_production
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_is_production
+#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_is_production
+msgid ""
+"When checked, requests go to the production DHL endpoint. Leave unchecked to "
+"use the sandbox."
+msgstr ""

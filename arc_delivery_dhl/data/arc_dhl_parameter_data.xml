@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Default configuration parameters. API key is never stored here. -->
+    <record id="arc_dhl_param_sandbox" model="ir.config_parameter">
+        <field name="key">arc_delivery_dhl.is_production</field>
+        <field name="value">False</field>
+    </record>
+
+    <record id="arc_dhl_param_timeout" model="ir.config_parameter">
+        <field name="key">arc_delivery_dhl.request_timeout</field>
+        <field name="value">30</field>
+    </record>
+</odoo>

@@ -1,0 +1,5 @@
+.env
+*.pyc
+__pycache__/
+*.pot
+!i18n/*.pot

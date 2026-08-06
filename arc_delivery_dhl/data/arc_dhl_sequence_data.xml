@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_arc_dhl_booking" model="ir.sequence">
+        <field name="name">DHL Booking</field>
+        <field name="code">arc.dhl.booking</field>
+        <field name="prefix">DHL-B/</field>
+        <field name="padding">6</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_arc_dhl_price_quote" model="ir.sequence">
+        <field name="name">DHL Price Quote</field>
+        <field name="code">arc.dhl.price.quote</field>
+        <field name="prefix">DHL-Q/</field>
+        <field name="padding">6</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+</odoo>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="arc_dhl_label_list_view" model="ir.ui.view">
+        <field name="name">arc.dhl.label.list</field>
+        <field name="model">arc.dhl.label</field>
+        <field name="arch" type="xml">
+            <list string="DHL Labels">
+                <field name="name"/>
+                <field name="booking_id"/>
+                <field name="picking_id"/>
+                <field name="tracking_number"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="arc_dhl_label_form_view" model="ir.ui.view">
+        <field name="name">arc.dhl.label.form</field>
+        <field name="model">arc.dhl.label</field>
+        <field name="arch" type="xml">
+            <form string="DHL Label">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="booking_id"/>
+                        <field name="picking_id"/>
+                        <field name="tracking_number"/>
+                        <field name="label_data" filename="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="arc_dhl_label_action" model="ir.actions.act_window">
+        <field name="name">DHL Labels</field>
+        <field name="res_model">arc.dhl.label</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

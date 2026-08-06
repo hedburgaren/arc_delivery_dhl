@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="arc_dhl_price_quote_list_view" model="ir.ui.view">
+        <field name="name">arc.dhl.price.quote.list</field>
+        <field name="model">arc.dhl.price.quote</field>
+        <field name="arch" type="xml">
+            <list string="DHL Price Quotes">
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="carrier_id"/>
+                <field name="product_id"/>
+                <field name="state"/>
+                <field name="price"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="arc_dhl_price_quote_form_view" model="ir.ui.view">
+        <field name="name">arc.dhl.price.quote.form</field>
+        <field name="model">arc.dhl.price.quote</field>
+        <field name="arch" type="xml">
+            <form string="DHL Price Quote">
+                <header>
+                    <button name="action_request_quote" type="object" string="Request Quote"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,quoted,error"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sale_order_id"/>
+                            <field name="carrier_id"/>
+                            <field name="product_id"/>
+                        </group>
+                        <group>
+                            <field name="price"/>
+                            <field name="currency_id"/>
+                            <field name="cache_key"/>
+                        </group>
+                    </group>
+                    <field name="error_message" readonly="1" class="alert alert-danger"
+                           invisible="not error_message"/>
+                    <notebook>
+                        <page string="API Response">
+                            <field name="api_response"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="arc_dhl_price_quote_action" model="ir.actions.act_window">
+        <field name="name">DHL Price Quotes</field>
+        <field name="res_model">arc.dhl.price.quote</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

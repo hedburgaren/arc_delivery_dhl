@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="arc_dhl_product_action" model="ir.actions.act_window">
+        <field name="name">DHL Products</field>
+        <field name="res_model">arc.dhl.product</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_arc_dhl_root"
+              name="DHL"
+              parent="stock.menu_stock_config_settings"
+              sequence="50"/>
+
+    <menuitem id="menu_arc_dhl_product"
+              name="DHL Products"
+              action="arc_dhl_product_action"
+              parent="menu_arc_dhl_root"
+              sequence="10"/>
+
+    <menuitem id="menu_arc_dhl_booking"
+              name="Bookings"
+              action="arc_dhl_booking_action"
+              parent="menu_arc_dhl_root"
+              sequence="20"/>
+
+    <menuitem id="menu_arc_dhl_label"
+              name="Labels"
+              action="arc_dhl_label_action"
+              parent="menu_arc_dhl_root"
+              sequence="30"/>
+
+    <menuitem id="menu_arc_dhl_price_quote"
+              name="Price Quotes"
+              action="arc_dhl_price_quote_action"
+              parent="menu_arc_dhl_root"
+              sequence="40"/>
+</odoo>

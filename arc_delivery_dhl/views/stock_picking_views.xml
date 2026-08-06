@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_arc_dhl" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.arc.dhl</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button
+                    name="action_arc_dhl_view_bookings"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-truck"
+                    invisible="arc_dhl_booking_ids == []">
+                    <field name="arc_dhl_booking_ids" widget="statinfo"/>
+                </button>
+                <button
+                    name="action_arc_dhl_view_labels"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-file-pdf-o"
+                    invisible="arc_dhl_label_count == 0">
+                    <field name="arc_dhl_label_count" widget="statinfo"/>
+                </button>
+            </div>
+            <field name="state" position="before">
+                <field name="arc_dhl_freight_stale" invisible="1"/>
+                <div
+                    class="alert alert-warning"
+                    role="alert"
+                    invisible="not arc_dhl_freight_stale">
+                    The freight calculation is stale because the order has changed after the delivery line was added. Recalculate or rebook freight.
+                </div>
+            </field>
+        </field>
+    </record>
+</odoo>

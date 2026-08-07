@@ -382,6 +382,12 @@ New models:
 Frontend integration:
 - `arc_industrial_ui/controllers/_helpers.py::apply_shipping_and_packaging()` routes to DHL when `arc.dhl.visualcutter.adapter` exists and the ICP `arc_delivery_dhl.visualcutter_enabled` is not explicitly disabled. Falls back to `arc.frakt.engine` when DHL is unavailable.
 
+Settings toggles (Settings > Sales > DHL Freight Sweden):
+- `arc_dhl_visualcutter_enabled`: show DHL price quotes in VisualCutter.
+- `arc_dhl_booking_enabled`: allow shipment booking from Odoo pickings.
+- `arc_dhl_tracking_enabled`: show DHL tracking links on deliveries.
+- `delivery_carrier.py` blocks `send_shipping` and hides tracking links when the corresponding toggle is off.
+
 Migrations:
 - `migrations/18.0.1.2.0/pre-migration.py` makes `carrier_id` nullable.
 - `migrations/18.0.1.2.0/post-migration.py` makes `sale_order_id` nullable.
@@ -398,6 +404,6 @@ Verification:
 - DHL test environment currently returns `400 Index was outside the bounds of the array.` for every request with the supplied test key, including direct `curl` calls to `test-api.freight-logistics.dhl.com`. This appears to be a key/account issue on DHL's side, not a payload problem.
 
 Open follow-up:
-- Confirm with DHL whether the test key is activated for PriceQuote and, if not, obtain a working sandbox key.
+- The supplied test key returns `400 Index was outside the bounds of the array.` for every endpoint, including `/price-quote`, `/postal-codes` and `/products`, with multiple header formats. According to DHL, the key must be created inside an Organisation/Application in the API Farm test environment. Verify that the key is linked to an active test application, or create a new one in DHLAPIFarm test.
 - Verify the exact PriceQuote payload shape once a working key is available; add sender/postal-code fields if required.
 - The local change in `/srv/odoo/plastshop/addons/arc_industrial_ui/controllers/_helpers.py` is not under separate version control; it must be preserved when that module is next deployed.

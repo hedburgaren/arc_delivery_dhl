@@ -131,7 +131,7 @@ class ArcDhlRequestMixin(models.AbstractModel):
         request_headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Client-Key': api_key,
+            'client-key': api_key,
         }
         if headers:
             request_headers.update(headers)
@@ -173,8 +173,11 @@ class ArcDhlRequestMixin(models.AbstractModel):
 
         if not response.ok:
             _logger.error(
-                'DHL API error %s: %s',
+                'DHL API error %s on %s %s\nRequest body: %s\nResponse body: %s',
                 response.status_code,
+                method.upper(),
+                url,
+                data,
                 body,
             )
             raise UserError(_(

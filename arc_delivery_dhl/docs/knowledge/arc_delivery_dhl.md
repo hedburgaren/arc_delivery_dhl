@@ -10,7 +10,7 @@ Depends on `arc_industrial_ops`, `delivery`, `stock` and `mail`.
 ## API: Swedish DHL Freight API Farm
 
 All endpoints live under `freight-logistics.dhl.com` and authenticate with a
-`Client-Key` header:
+`client-key` header:
 
 - Sandbox: `https://test-api.freight-logistics.dhl.com`
 - Production: `https://api.freight-logistics.dhl.com`
@@ -18,8 +18,8 @@ All endpoints live under `freight-logistics.dhl.com` and authenticate with a
 APIs used:
 - **Product API** (`/productapi/v1/`) for product catalog lookups.
 - **PriceQuote API** (`/pricequoteapi/v1/`) for gross price quotes.
-- **Transport Instruction / Booking API** for shipment booking.
-- **Print API** for label retrieval.
+- **TransportInstruction API** (`/transportinstructionapi/v1/`) for shipment booking.
+- **Print API** (`/printapi/v1/`) for label retrieval.
 
 Credentials are read from `ir.config_parameter` first, then environment
 variables, then a `.env` file next to the module. The `.env` file must never be
@@ -29,7 +29,7 @@ committed.
 
 | What | Where |
 |------|-------|
-| API Farm request client (Client-Key) | `models/arc_dhl_request_mixin.py:0`, `arc.dhl.request.mixin._arc_dhl_request()` |
+| API Farm request client (client-key) | `models/arc_dhl_request_mixin.py:0`, `arc.dhl.request.mixin._arc_dhl_request()` |
 | Settings fields | `models/res_config_settings.py:0`, `res.config.settings` |
 | Price quote model and cache | `models/arc_dhl_price_quote.py:0`, `arc.dhl.price.quote` |
 | Price quote payload builder | `models/arc_dhl_price_quote.py:0`, `arc.dhl.price.quote._arc_dhl_build_quote_payload()` |
@@ -74,7 +74,7 @@ Shipment booking record linked to a picking. File: `models/arc_dhl_booking.py:10
 Key fields: `name`, `carrier_id`, `picking_id`, `sale_order_id`, `product_id`, `state`, `dhl_booking_id`, `dhl_tracking_numbers`, `label_ids`, `price`, `api_request`, `api_response`, `error_message`.
 
 Key methods:
-- `action_book_shipment()` : validates, builds payload, calls `/transport-instruction`, fetches labels. `models/arc_dhl_booking.py:87`.
+- `action_book_shipment()` : validates, builds payload, calls `/transportinstructionapi/v1/transportinstruction/sendtransportinstruction`, fetches labels. `models/arc_dhl_booking.py:87`.
 
 ### arc.dhl.label
 Binary PDF label attached to a booking. File: `models/arc_dhl_label.py:0`.
@@ -90,7 +90,7 @@ Key methods:
 Settings are exposed under `Settings > Sales > DHL Freight Sweden` via `views/res_config_settings_views.xml`.
 
 Config parameters:
-- `arc_delivery_dhl.api_key` - Swedish API Farm Client-Key.
+- `arc_delivery_dhl.api_key` - Swedish API Farm client-key.
 - `arc_delivery_dhl.price_quote_api_key` - Global Price Quote API consumer key.
 - `arc_delivery_dhl.price_quote_api_secret` - Global Price Quote API consumer secret.
 - `arc_delivery_dhl.eid_username` - DHL eID username for Price Quote payloads.
@@ -100,6 +100,7 @@ Config parameters:
 - `arc_delivery_dhl.visualcutter_enabled` - show DHL prices in VisualCutter.
 - `arc_delivery_dhl.booking_enabled` - allow shipment booking from pickings.
 - `arc_delivery_dhl.tracking_enabled` - show tracking links.
+- `arc_delivery_dhl.customer_number` - DHL Freight customer number (avtalsnummer). Required for booking; sent as the consignor party identifier.
 
 Environment fallbacks:
 - `DHL_SANDBOX_API_KEY` / `DHL_API_KEY` for the API Farm.
@@ -113,12 +114,21 @@ Environment fallbacks:
 - `data/arc_dhl_parameter_data.xml` - default config parameters.
 - `migrations/18.0.1.1.0/` and `migrations/18.0.1.2.0/` - historical migrations.
 
+## Sandbox verification
+
+The booking flow has been verified against the DHL Freight Sweden sandbox:
+- `action_book_shipment()` calls `/transportinstructionapi/v1/transportinstruction/sendtransportinstruction`.
+- The payload follows the DHL `Shipment` schema: `productCode`, `payerCode`, `parties[]`, `pieces[]`, totals and references.
+- The consignor party id is set from `arc_delivery_dhl.customer_number`.
+- Piece dimensions are lifted to product-specific minimums observed from the sandbox (e.g. DHL PAKET `102` needs width >= 11 cm and height >= 2 cm).
+- Labels are fetched via `/printapi/v1/print/printdocumentsbyid` using the returned DHL shipment id.
+
 ## Tests
 
 Tag: `arc_dhl`. Run with `--test-tags arc_dhl`.
 
 Key test files:
-- `tests/test_arc_dhl_request_mixin.py` - environment and key selection, Client-Key header, OAuth token flow.
+- `tests/test_arc_dhl_request_mixin.py` - environment and key selection, client-key header, OAuth token flow.
 - `tests/test_arc_dhl_price_quote.py` - cache behaviour and DHL payload format.
 - `tests/test_arc_dhl_visualcutter_adapter.py` - adapter fallback and pricing.
 - `tests/test_arc_dhl_booking.py` - booking validation and label creation.

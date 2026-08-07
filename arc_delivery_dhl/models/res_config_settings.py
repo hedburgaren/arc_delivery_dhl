@@ -42,3 +42,9 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='arc_delivery_dhl.tracking_enabled',
         help='Show DHL tracking links on deliveries.',
     )
+    arc_dhl_customer_number = fields.Char(
+        string='DHL customer number',
+        config_parameter='arc_delivery_dhl.customer_number',
+        help='DHL Freight customer number (avtalsnummer). Required for booking '
+             'shipments; it is sent as the consignor party identifier.',
+    )

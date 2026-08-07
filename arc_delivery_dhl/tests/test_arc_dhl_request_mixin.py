@@ -12,6 +12,9 @@ class TestArcDhlRequestMixin(TransactionCase):
 
     def test_sandbox_environment_uses_sandbox_key(self):
         self.env['ir.config_parameter'].sudo().set_param(
+            'arc_delivery_dhl.api_key', ''
+        )
+        self.env['ir.config_parameter'].sudo().set_param(
             'arc_delivery_dhl.force_environment', 'sandbox'
         )
         with patch.dict(os.environ, {'DHL_SANDBOX_API_KEY': 'sandbox-key'}, clear=False):
@@ -20,6 +23,9 @@ class TestArcDhlRequestMixin(TransactionCase):
         self.assertEqual(key, 'sandbox-key')
 
     def test_production_environment_uses_production_key(self):
+        self.env['ir.config_parameter'].sudo().set_param(
+            'arc_delivery_dhl.api_key', ''
+        )
         self.env['ir.config_parameter'].sudo().set_param(
             'arc_delivery_dhl.force_environment', 'production'
         )
@@ -67,5 +73,5 @@ class TestArcDhlRequestMixin(TransactionCase):
         )
 
         call_kwargs = mock_request.call_args.kwargs
-        self.assertEqual(call_kwargs['headers']['Client-Key'], 'client-key-value')
+        self.assertEqual(call_kwargs['headers']['client-key'], 'client-key-value')
         self.assertNotIn('Authorization', call_kwargs['headers'])

@@ -15,6 +15,9 @@ class TestArcDhlBooking(TransactionCase):
         cls.env['ir.config_parameter'].sudo().set_param(
             'arc_delivery_dhl.api_key', 'test-api-key'
         )
+        cls.env['ir.config_parameter'].sudo().set_param(
+            'arc_delivery_dhl.customer_number', '123456789'
+        )
         cls.partner = cls.env['res.partner'].create({
             'name': 'Test Customer',
             'zip': '58118',
@@ -90,12 +93,41 @@ class TestArcDhlBooking(TransactionCase):
             'picking_id': picking.id,
             'product_id': self.dhl_product.id,
         })
-        payload = booking._arc_dhl_build_payload(booking._arc_dhl_collect_packages(picking))
-        self.assertIn('sender', payload)
-        self.assertIn('receiver', payload)
-        self.assertIn('shipment', payload)
-        self.assertEqual(payload['shipment']['productCode'], self.dhl_product.code)
-        self.assertTrue(payload['shipment']['packages'])
+        payload = booking._arc_dhl_build_payload(
+            booking._arc_dhl_collect_packages(picking)
+        )
+        self.assertIn('productCode', payload)
+        self.assertIn('payerCode', payload)
+        self.assertIn('parties', payload)
+        self.assertIn('pieces', payload)
+        self.assertEqual(payload['productCode'], self.dhl_product.code)
+        self.assertTrue(payload['pieces'])
+        self.assertEqual(len(payload['parties']), 2)
+        consignor = payload['parties'][0]
+        self.assertEqual(consignor['type'], 'Consignor')
+        self.assertTrue(consignor.get('id'))
+        piece = payload['pieces'][0]
+        self.assertGreaterEqual(piece['width'], 11.0)
+        self.assertGreaterEqual(piece['height'], 2.0)
+
+    def test_booking_requires_customer_number(self):
+        self.env['ir.config_parameter'].sudo().set_param(
+            'arc_delivery_dhl.customer_number', ''
+        )
+        picking = self._create_picking()
+        carrier = self.env['delivery.carrier'].create({
+            'name': 'DHL Test',
+            'delivery_type': 'dhl_freight_se',
+            'product_id': self.env.ref('delivery.product_product_delivery').id,
+            'arc_dhl_product_id': self.dhl_product.id,
+        })
+        booking = self.env['arc.dhl.booking'].create({
+            'carrier_id': carrier.id,
+            'picking_id': picking.id,
+            'product_id': self.dhl_product.id,
+        })
+        with self.assertRaises(UserError):
+            booking.action_book_shipment()
 
     def test_length_validation_blocks_oversized_package(self):
         picking = self._create_picking()
@@ -124,8 +156,11 @@ class TestArcDhlBooking(TransactionCase):
             'ok': True,
             'text': '',
             'json': lambda *args, **kwargs: {
-                'bookingId': 'DHL-BOOK-123',
-                'trackingNumbers': ['JD0012345678'],
+                'status': 'OK',
+                'transportInstruction': {
+                    'shipmentId': 'DHL-BOOK-123',
+                    'trackingNumbers': ['JD0012345678'],
+                },
             },
         })()
         label_response = type('Response', (), {
@@ -133,9 +168,9 @@ class TestArcDhlBooking(TransactionCase):
             'ok': True,
             'text': '',
             'json': lambda *args, **kwargs: {
-                'documents': [{
+                'reports': [{
                     'name': 'label.pdf',
-                    'data': 'JVBERi0xLg==',
+                    'content': 'JVBERi0xLg==',
                     'trackingNumber': 'JD0012345678',
                 }],
             },
@@ -158,3 +193,6 @@ class TestArcDhlBooking(TransactionCase):
         result = booking.action_book_shipment()
         self.assertTrue(result['success'])
         self.assertEqual(booking.state, 'booked')
+        self.assertEqual(booking.dhl_booking_id, 'DHL-BOOK-123')
+        self.assertEqual(booking.dhl_tracking_numbers, 'JD0012345678')
+        self.assertTrue(booking.label_ids)

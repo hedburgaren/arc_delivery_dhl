@@ -181,7 +181,7 @@ class TestArcDhlPriceQuote(TransactionCase):
             '/pricequoteapi/v1/pricequote/quoteforgrossprice',
             call.kwargs['url'],
         )
-        self.assertEqual(call.kwargs['headers']['Client-Key'], 'test-api-key')
+        self.assertEqual(call.kwargs['headers']['client-key'], 'test-api-key')
         payload = json.loads(call.kwargs['data'])
         self.assertEqual(payload['shipment']['dhlProductCode'], 'DHLPaket')
         self.assertEqual(payload['shipment']['payerCode'], '1')

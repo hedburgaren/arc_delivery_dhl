@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0-20260513\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-07 09:51+0000\n"
-"PO-Revision-Date: 2026-08-07 09:51+0000\n"
+"POT-Creation-Date: 2026-08-07 11:52+0000\n"
+"PO-Revision-Date: 2026-08-07 11:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -34,17 +34,6 @@ msgstr ""
 #. module: arc_delivery_dhl
 #: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_price_quote_form_view
 msgid "API Response"
-msgstr ""
-
-#. module: arc_delivery_dhl
-#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_api_key
-#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_api_key
-#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_api_key
-#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_api_key
-#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_api_key
-#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_api_key
-#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_api_key
-msgid "API key for DHL Freight Sweden API Farm. Stored in Odoo settings."
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -164,6 +153,21 @@ msgid "Catch-all for anything outside standard products. Requires agreement."
 msgstr ""
 
 #. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_api_key
+#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_api_key
+msgid ""
+"Client-Key for the Swedish DHL Freight API Farm (products, price quotes, "
+"booking, labels)."
+msgstr ""
+"Client-Key för Swedish DHL Freight API Farm (produkter, prisoffert, "
+"bokning, etiketter)."
+
+#. module: arc_delivery_dhl
 #: model:ir.model,name:arc_delivery_dhl.model_res_config_settings
 msgid "Config Settings"
 msgstr "Konfigurationsinställningar"
@@ -171,7 +175,7 @@ msgstr "Konfigurationsinställningar"
 #. module: arc_delivery_dhl
 #: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.res_config_settings_view_form_arc_dhl
 msgid "Configure the DHL Freight Sweden API Farm integration."
-msgstr ""
+msgstr "Konfigurera integrationen med DHL Freight Sweden API Farm."
 
 #. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__create_uid
@@ -210,15 +214,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_api_key
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_api_key
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__arc_dhl_api_key
-msgid "DHL API key"
-msgstr ""
+msgid "DHL API Farm key"
+msgstr "DHL API Farm-nyckel"
 
 #. module: arc_delivery_dhl
 #. odoo-python
 #: code:addons/arc_delivery_dhl/models/arc_dhl_request_mixin.py:0
 msgid ""
 "DHL API key is not configured. Set it in Settings > DHL Delivery or define "
-"the DHL_API_KEY environment variable."
+"the DHL_SANDBOX_API_KEY / DHL_API_KEY environment variable or .env entry."
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -406,6 +410,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_delivery_carrier__arc_dhl_product_id
 msgid "DHL product"
 msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_price_quote.py:0
+msgid "DHL product code %(code)s has no PriceQuote API mapping."
+msgstr "DHL-produktkod %(code)s har ingen mappning mot PriceQuote API."
 
 #. module: arc_delivery_dhl
 #: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__code
@@ -883,6 +893,11 @@ msgid "Price Quotes"
 msgstr ""
 
 #. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__price_incl_vat
+msgid "Price incl. VAT"
+msgstr ""
+
+#. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__code
 msgid "Product code"
 msgstr ""
@@ -1016,8 +1031,10 @@ msgstr "Leveranssätt"
 #: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_visualcutter_enabled
 msgid ""
 "Show DHL freight prices in the public VisualCutter calculator. Requires a "
-"valid DHL API key."
+"valid DHL API Farm key."
 msgstr ""
+"Visa DHL-fraktpriser i den publika VisualCutter-kalkylatorn. Kräver en "
+"giltig DHL API Farm-nyckel."
 
 #. module: arc_delivery_dhl
 #: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_tracking_enabled
@@ -1078,6 +1095,11 @@ msgstr ""
 #. module: arc_delivery_dhl
 #: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dhl_product__is_domestic
 msgid "True for products available within Sweden."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_price_quote__vat_amount
+msgid "VAT amount"
 msgstr ""
 
 #. module: arc_delivery_dhl

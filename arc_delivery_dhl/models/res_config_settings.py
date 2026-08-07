@@ -7,9 +7,10 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     arc_dhl_api_key = fields.Char(
-        string='DHL API key',
+        string='DHL API Farm key',
         config_parameter='arc_delivery_dhl.api_key',
-        help='API key for DHL Freight Sweden API Farm. Stored in Odoo settings.',
+        help='Client-Key for the Swedish DHL Freight API Farm '
+             '(products, price quotes, booking, labels).',
     )
     arc_dhl_is_production = fields.Boolean(
         string='DHL production environment',
@@ -28,7 +29,7 @@ class ResConfigSettings(models.TransientModel):
         string='DHL price quote in VisualCutter',
         config_parameter='arc_delivery_dhl.visualcutter_enabled',
         help='Show DHL freight prices in the public VisualCutter calculator. '
-             'Requires a valid DHL API key.',
+             'Requires a valid DHL API Farm key.',
     )
     arc_dhl_booking_enabled = fields.Boolean(
         string='DHL shipment booking',

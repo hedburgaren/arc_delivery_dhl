@@ -19,7 +19,24 @@ class TestArcDhlVisualCutterAdapter(TransactionCase):
     def test_adapter_returns_dhl_price(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.ok = True
-        mock_request.return_value.json.return_value = {'price': 175.0}
+        mock_request.return_value.json.return_value = [
+            {
+                'description': 'Total',
+                'descriptionEng': 'Total price',
+                'id': 'TotalPrice',
+                'sortOrder': 100,
+                'unit': 'SEK',
+                'value': '175,00',
+            },
+            {
+                'description': 'Total incl VAT',
+                'descriptionEng': 'Total price inc VAT',
+                'id': 'TotalPriceIncVAT',
+                'sortOrder': 120,
+                'unit': 'SEK',
+                'value': '218,75',
+            },
+        ]
         mock_request.return_value.text = ''
 
         batch = {
@@ -30,7 +47,7 @@ class TestArcDhlVisualCutterAdapter(TransactionCase):
             'cut_weight_kg': 5.0,
         }
         result = self.env['arc.dhl.visualcutter.adapter'].quote_for_batch(
-            batch, {'country_code': 'SE', 'zip': '58118'},
+            batch, {'country_code': 'SE', 'zip': '11122'},
         )
         self.assertEqual(result['shipping_fee'], 175.0)
         self.assertEqual(result['shipping_info']['rule_name'], 'DHL Freight Sweden')
@@ -45,7 +62,7 @@ class TestArcDhlVisualCutterAdapter(TransactionCase):
             'cut_weight_kg': 0.0,
         }
         result = self.env['arc.dhl.visualcutter.adapter'].quote_for_batch(
-            batch, {'country_code': 'SE', 'zip': '58118'},
+            batch, {'country_code': 'SE', 'zip': '11122'},
         )
         self.assertEqual(result['shipping_fee'], 0.0)
         self.assertIn('reason', result['shipping_info'])

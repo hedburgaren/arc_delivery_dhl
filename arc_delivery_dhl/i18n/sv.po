@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0-20260513\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-06 17:25+0000\n"
-"PO-Revision-Date: 2026-08-06 17:25+0000\n"
+"POT-Creation-Date: 2026-08-07 09:51+0000\n"
+"PO-Revision-Date: 2026-08-07 09:51+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -61,6 +61,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product__active
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_product_rule__active
 msgid "Active"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_booking_enabled
+msgid ""
+"Allow bookings to be created directly from Odoo pickings. Disable to keep "
+"the integration quote-only."
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -370,6 +383,17 @@ msgid "DHL price quote"
 msgstr ""
 
 #. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__arc_dhl_visualcutter_enabled
+msgid "DHL price quote in VisualCutter"
+msgstr ""
+
+#. module: arc_delivery_dhl
 #. odoo-python
 #: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
 msgid "DHL print response contained no documents."
@@ -428,12 +452,39 @@ msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_booking
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_booking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__arc_dhl_booking_enabled
 msgid "DHL shipment booking"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/delivery_carrier.py:0
+msgid ""
+"DHL shipment booking is disabled in Settings. Enable it to book directly "
+"from Odoo, or book manually in myDHLFreight and paste the tracking reference"
+" into the picking."
 msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:ir.model,name:arc_delivery_dhl.model_arc_dhl_label
 msgid "DHL shipping label"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__arc_dhl_tracking_enabled
+msgid "DHL tracking links"
 msgstr ""
 
 #. module: arc_delivery_dhl
@@ -954,6 +1005,30 @@ msgstr ""
 #: model:ir.model,name:arc_delivery_dhl.model_delivery_carrier
 msgid "Shipping Methods"
 msgstr "Leveranssätt"
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_visualcutter_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_visualcutter_enabled
+msgid ""
+"Show DHL freight prices in the public VisualCutter calculator. Requires a "
+"valid DHL API key."
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_tracking_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_tracking_enabled
+msgid "Show DHL tracking links on deliveries."
+msgstr ""
 
 #. module: arc_delivery_dhl
 #: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dhl_booking__state

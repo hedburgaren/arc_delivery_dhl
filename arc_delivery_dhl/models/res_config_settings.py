@@ -24,3 +24,20 @@ class ResConfigSettings(models.TransientModel):
         help='Overrides the production flag for testing. Clear to use the '
              'production flag normally.',
     )
+    arc_dhl_visualcutter_enabled = fields.Boolean(
+        string='DHL price quote in VisualCutter',
+        config_parameter='arc_delivery_dhl.visualcutter_enabled',
+        help='Show DHL freight prices in the public VisualCutter calculator. '
+             'Requires a valid DHL API key.',
+    )
+    arc_dhl_booking_enabled = fields.Boolean(
+        string='DHL shipment booking',
+        config_parameter='arc_delivery_dhl.booking_enabled',
+        help='Allow bookings to be created directly from Odoo pickings. '
+             'Disable to keep the integration quote-only.',
+    )
+    arc_dhl_tracking_enabled = fields.Boolean(
+        string='DHL tracking links',
+        config_parameter='arc_delivery_dhl.tracking_enabled',
+        help='Show DHL tracking links on deliveries.',
+    )

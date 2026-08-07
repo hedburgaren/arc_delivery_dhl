@@ -45,6 +45,7 @@ authenticate with a Client-Key header.
         'views/arc_dhl_booking_views.xml',
         'views/arc_dhl_label_views.xml',
         'views/arc_dhl_price_quote_views.xml',
+        'views/sale_order_views.xml',
         'views/arc_dhl_menus.xml',
     ],
     'demo': [],

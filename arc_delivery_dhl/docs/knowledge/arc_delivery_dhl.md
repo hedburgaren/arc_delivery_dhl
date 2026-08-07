@@ -39,6 +39,8 @@ committed.
 | DHL product catalog records | `models/arc_dhl_product.py:0`, `arc.dhl.product` |
 | Shipment booking | `models/arc_dhl_booking.py:0`, `arc.dhl.booking.action_book_shipment()` |
 | Label retrieval and storage | `models/arc_dhl_label.py:0`, `arc.dhl.label` |
+| Sale order freight quote | `models/sale_order.py:0`, `sale.order.action_arc_dhl_quote()` |
+| Sale order freight line | `models/sale_order.py:0`, `sale.order.action_arc_dhl_apply_shipping()` |
 
 ## Models
 
@@ -114,6 +116,22 @@ Environment fallbacks:
 - `data/arc_dhl_parameter_data.xml` - default config parameters.
 - `migrations/18.0.1.1.0/` and `migrations/18.0.1.2.0/` - historical migrations.
 
+## Backend sale.order flow
+
+`sale.order` is extended in `models/sale_order.py` so a salesperson can request a DHL freight quote directly from a quotation/order and add the result as a separate freight line.
+
+Fields added to `sale.order`:
+- `arc_dhl_price_quote_id` - latest `arc.dhl.price.quote` linked to the order.
+- `arc_dhl_shipping_cost` - freight cost excluding VAT from the quote.
+- `arc_dhl_shipping_cost_incl_vat` - freight cost including VAT from the quote.
+- `arc_dhl_product_id` - optional product lock; if empty the product selector chooses the first matching DHL product.
+
+Actions:
+- `action_arc_dhl_quote()` - requires a confirmed `arc.package.proposal`, selects a DHL product, creates an `arc.dhl.price.quote`, calls the DHL PriceQuote API and stores the result. Also sets `carrier_id` to the configured DHL carrier.
+- `action_arc_dhl_apply_shipping()` - adds or updates a sale order line using the service product named "Frakt", priced at `arc_dhl_shipping_cost`. Existing freight lines are updated instead of duplicated.
+
+UI additions are in `views/sale_order_views.xml`: buttons next to "Calculate packaging", a stat button showing the DHL freight cost and a "DHL Freight" notebook page.
+
 ## Sandbox verification
 
 The booking flow has been verified against the DHL Freight Sweden sandbox:
@@ -122,6 +140,8 @@ The booking flow has been verified against the DHL Freight Sweden sandbox:
 - The consignor party id is set from `arc_delivery_dhl.customer_number`.
 - Piece dimensions are lifted to product-specific minimums observed from the sandbox (e.g. DHL PAKET `102` needs width >= 11 cm and height >= 2 cm).
 - Labels are fetched via `/printapi/v1/print/printdocumentsbyid` using the returned DHL shipment id.
+
+The sale.order flow has also been verified against the sandbox: a test order with a confirmed packing proposal received a DHL PAKET quote of SEK 213.82 excl. VAT and a freight line was created automatically.
 
 ## Tests
 
@@ -133,3 +153,4 @@ Key test files:
 - `tests/test_arc_dhl_visualcutter_adapter.py` - adapter fallback and pricing.
 - `tests/test_arc_dhl_booking.py` - booking validation and label creation.
 - `tests/test_arc_dhl_product_rule.py` - product selection rules.
+- `tests/test_arc_dhl_sale_order.py` - backend order freight quote and freight line creation.

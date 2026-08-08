@@ -63,6 +63,14 @@ class DeliveryCarrier(models.Model):
     def dhl_freight_se_send_shipping(self, pickings):
         """Book shipments and create labels for the given pickings."""
         self.ensure_one()
+        if not self.env['ir.config_parameter'].sudo().get_param(
+            'arc_delivery_dhl.booking_enabled'
+        ):
+            raise UserError(_(
+                'DHL shipment booking is disabled in Settings. Enable it to '
+                'book directly from Odoo, or book manually in myDHLFreight and '
+                'paste the tracking reference into the picking.'
+            ))
         res = []
         for picking in pickings:
             booking = self.env['arc.dhl.booking'].create({
@@ -82,6 +90,10 @@ class DeliveryCarrier(models.Model):
     def dhl_freight_se_get_tracking_link(self, picking):
         """Return the DHL tracking URL for a picking."""
         self.ensure_one()
+        if not self.env['ir.config_parameter'].sudo().get_param(
+            'arc_delivery_dhl.tracking_enabled'
+        ):
+            return False
         tokens = [
             t.strip()
             for t in (picking.carrier_tracking_ref or '').split(',')

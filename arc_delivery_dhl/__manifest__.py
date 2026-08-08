@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ARC Delivery DHL',
-    'version': '18.0.1.1.0',
+    'version': '18.0.1.2.0',
     'author': 'ARC Gruppen AB',
     'maintainer': 'Chrille Hedberg',
     'maintainer_email': 'chrille.hedberg@arcgruppen.se',
@@ -15,15 +15,16 @@ ARC Delivery DHL
 Integrates DHL Freight Sweden (Swedish API Farm) as an Odoo delivery carrier.
 
 Features:
-- Book shipments via DHL TransportInstruction API
-- Retrieve labels via DHL Print API
-- Request price quotes via DHL PriceQuote API
+- Select DHL products via rules and the Product API
+- Request gross price quotes via the PriceQuote API
+- Book shipments via the TransportInstruction API
+- Retrieve labels via the Print API
 - Support sandbox and production environments
 - Read credentials from Odoo settings or environment variables
 - Tie into the ARC packing planner package structure
 
-This module is built for the Swedish API Farm. It does not use the global
-DHL Freight APIs on developer.dhl.com.
+All endpoints live under the Swedish API Farm (freight-logistics.dhl.com) and
+authenticate with a Client-Key header.
     """,
     'depends': [
         'arc_industrial_ops',
@@ -44,6 +45,7 @@ DHL Freight APIs on developer.dhl.com.
         'views/arc_dhl_booking_views.xml',
         'views/arc_dhl_label_views.xml',
         'views/arc_dhl_price_quote_views.xml',
+        'views/sale_order_views.xml',
         'views/arc_dhl_menus.xml',
     ],
     'demo': [],

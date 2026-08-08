@@ -1,11 +1,26 @@
 # -*- coding: utf-8 -*-
-"""Shared DHL API client utilities."""
+"""Shared DHL Swedish API Farm client utilities.
+
+The module talks to the Swedish DHL Freight API Farm
+(``freight-logistics.dhl.com``). All endpoints authenticate with a
+``Client-Key`` header, including Product, PriceQuote, Booking and Print APIs.
+"""
 import json
 import logging
 import os
 from urllib.parse import urljoin
 
 import requests
+
+from odoo import _, api, models
+from odoo.exceptions import UserError
+
+
+DEFAULT_TIMEOUT = 30
+SANDBOX_BASE_URL = 'https://test-api.freight-logistics.dhl.com'
+PRODUCTION_BASE_URL = 'https://api.freight-logistics.dhl.com'
+
+_logger = logging.getLogger(__name__)
 
 
 def _read_dotenv(key, module_path):
@@ -32,58 +47,68 @@ def _read_dotenv(key, module_path):
         return ''
     return ''
 
-from odoo import _, api, fields, models
-from odoo.exceptions import UserError
-
-_logger = logging.getLogger(__name__)
-
-
-DEFAULT_TIMEOUT = 30
-SANDBOX_BASE_URL = 'https://test-api.freight-logistics.dhl.com'
-PRODUCTION_BASE_URL = 'https://api.freight-logistics.dhl.com'
-
 
 class ArcDhlRequestMixin(models.AbstractModel):
     _name = 'arc.dhl.request.mixin'
     _description = 'DHL API request mixin'
 
     @api.model
+    def _arc_dhl_get_environment(self):
+        """Return 'sandbox' or 'production' for the active DHL environment."""
+        param = self.env['ir.config_parameter'].sudo()
+        force_env = param.get_param('arc_delivery_dhl.force_environment')
+        if force_env == 'sandbox':
+            return 'sandbox'
+        if force_env == 'production':
+            return 'production'
+        is_prod = param.get_param('arc_delivery_dhl.is_production')
+        return 'production' if is_prod else 'sandbox'
+
+    @api.model
     def _arc_dhl_get_api_key(self):
-        """Return the DHL API key from settings or environment.
+        """Return the DHL API Farm Client-Key from settings or environment.
 
         The key is never stored in versioned code. It is read from the
-        ir.config_parameter record or, as a fallback, from the DHL_API_KEY
-        environment variable.
+        ir.config_parameter record or, as a fallback, from an environment
+        variable or .env file. Sandbox and production use separate keys.
         """
         key = self.env['ir.config_parameter'].sudo().get_param(
             'arc_delivery_dhl.api_key'
         )
         if key:
             return key
-        key = os.environ.get('DHL_API_KEY', '').strip()
+
+        env = self._arc_dhl_get_environment()
+        env_key = 'DHL_SANDBOX_API_KEY' if env == 'sandbox' else 'DHL_API_KEY'
+
+        key = os.environ.get(env_key, '').strip()
         if key:
             return key
         module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        key = _read_dotenv(env_key, module_path)
+        if key:
+            return key
+        # Fallback to the legacy single key for backwards compatibility.
+        key = os.environ.get('DHL_API_KEY', '').strip()
+        if key:
+            return key
         key = _read_dotenv('DHL_API_KEY', module_path)
         if key:
             return key
         raise UserError(_(
             'DHL API key is not configured. Set it in Settings > DHL Delivery '
-            'or define the DHL_API_KEY environment variable.'
+            'or define the DHL_SANDBOX_API_KEY / DHL_API_KEY environment '
+            'variable or .env entry.'
         ))
 
     @api.model
     def _arc_dhl_get_base_url(self):
-        """Return the active API base URL."""
-        param = self.env['ir.config_parameter'].sudo()
-        force_env = param.get_param('arc_delivery_dhl.force_environment')
-        if force_env == 'sandbox':
-            return SANDBOX_BASE_URL
-        if force_env == 'production':
-            return PRODUCTION_BASE_URL
-        # Default to sandbox unless the database is explicitly marked prod.
-        is_prod = param.get_param('arc_delivery_dhl.is_production')
-        return PRODUCTION_BASE_URL if is_prod else SANDBOX_BASE_URL
+        """Return the active Swedish API Farm base URL."""
+        return (
+            PRODUCTION_BASE_URL
+            if self._arc_dhl_get_environment() == 'production'
+            else SANDBOX_BASE_URL
+        )
 
     @api.model
     def _arc_dhl_request(
@@ -95,7 +120,10 @@ class ArcDhlRequestMixin(models.AbstractModel):
         headers=None,
         timeout=DEFAULT_TIMEOUT,
     ):
-        """Execute a DHL API request and return the parsed JSON response."""
+        """Execute a request against the Swedish DHL API Farm.
+
+        Authenticates with the ``Client-Key`` header.
+        """
         base_url = self._arc_dhl_get_base_url()
         url = urljoin(base_url + '/', endpoint.lstrip('/'))
         api_key = self._arc_dhl_get_api_key()
@@ -103,18 +131,19 @@ class ArcDhlRequestMixin(models.AbstractModel):
         request_headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': api_key,
+            'client-key': api_key,
         }
         if headers:
             request_headers.update(headers)
 
         data = json.dumps(payload) if payload is not None else None
         _logger.info(
-            'DHL API %s %s (payload keys: %s)',
+            'DHL API Farm %s %s (payload keys: %s)',
             method.upper(),
             url,
             sorted(payload.keys()) if isinstance(payload, dict) else 'n/a',
         )
+
         try:
             response = requests.request(
                 method=method.upper(),
@@ -144,14 +173,19 @@ class ArcDhlRequestMixin(models.AbstractModel):
 
         if not response.ok:
             _logger.error(
-                'DHL API error %s: %s',
+                'DHL API error %s on %s %s\nRequest body: %s\nResponse body: %s',
                 response.status_code,
+                method.upper(),
+                url,
+                data,
                 body,
             )
             raise UserError(_(
                 'DHL API returned error %(status)s: %(message)s',
                 status=response.status_code,
-                message=body.get('message') or body.get('raw') or response.reason,
+                message=body.get('message') or body.get('UserMessage')
+                        or body.get('detail') or body.get('raw')
+                        or response.reason,
             ))
 
         return body

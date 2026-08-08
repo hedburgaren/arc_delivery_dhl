@@ -75,3 +75,46 @@ class TestArcDhlProductRule(TransactionCase):
         product = self.env['arc.dhl.product.selector'].select_for_order(order)
         self.assertTrue(product)
         self.assertEqual(product.code, '212')
+
+    def test_select_from_packages_domestic_paket(self):
+        packages = [{
+            'length_cm': 50.0,
+            'width_cm': 30.0,
+            'height_cm': 10.0,
+            'weight_kg': 5.0,
+        }]
+        product = self.env['arc.dhl.product.selector'].select_from_packages(
+            packages, 'SE',
+        )
+        self.assertTrue(product)
+        self.assertEqual(product.code, '102')
+
+    def test_select_from_packages_international_road(self):
+        packages = [{
+            'length_cm': 50.0,
+            'width_cm': 30.0,
+            'height_cm': 10.0,
+            'weight_kg': 5.0,
+        }]
+        product = self.env['arc.dhl.product.selector'].select_from_packages(
+            packages, 'DK',
+        )
+        self.assertTrue(product)
+        self.assertEqual(product.code, '202')
+
+    def test_select_from_packages_silent_returns_false(self):
+        # Disable the catch-all SPECIAL rule so that an oversized shipment
+        # genuinely matches nothing.
+        self.env.ref('arc_delivery_dhl.dhl_product_rule_special').write({
+            'active': False,
+        })
+        packages = [{
+            'length_cm': 5000.0,
+            'width_cm': 100.0,
+            'height_cm': 100.0,
+            'weight_kg': 5000.0,
+        }]
+        product = self.env['arc.dhl.product.selector'].select_from_packages(
+            packages, 'SE', silent=True,
+        )
+        self.assertFalse(product)

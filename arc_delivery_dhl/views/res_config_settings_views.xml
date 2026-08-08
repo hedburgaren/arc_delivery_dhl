@@ -20,12 +20,28 @@
                                 <field name="arc_dhl_api_key" password="True"/>
                             </div>
                             <div class="mt16">
+                                <label for="arc_dhl_customer_number" class="o_form_label"/>
+                                <field name="arc_dhl_customer_number"/>
+                            </div>
+                            <div class="mt16">
                                 <field name="arc_dhl_is_production"/>
                                 <label for="arc_dhl_is_production" class="o_form_label"/>
                             </div>
                             <div class="mt16">
                                 <label for="arc_dhl_force_environment" class="o_form_label"/>
                                 <field name="arc_dhl_force_environment"/>
+                            </div>
+                            <div class="mt16">
+                                <field name="arc_dhl_visualcutter_enabled"/>
+                                <label for="arc_dhl_visualcutter_enabled" class="o_form_label"/>
+                            </div>
+                            <div class="mt16">
+                                <field name="arc_dhl_booking_enabled"/>
+                                <label for="arc_dhl_booking_enabled" class="o_form_label"/>
+                            </div>
+                            <div class="mt16">
+                                <field name="arc_dhl_tracking_enabled"/>
+                                <label for="arc_dhl_tracking_enabled" class="o_form_label"/>
                             </div>
                         </div>
                     </div>

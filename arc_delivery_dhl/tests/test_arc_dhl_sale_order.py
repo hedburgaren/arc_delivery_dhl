@@ -186,7 +186,8 @@ class TestArcDhlSaleOrder(TransactionCase):
         self.assertAlmostEqual(freight_line.price_unit, 197.82, places=2)
         self.assertTrue(order.arc_dhl_price_quote_id)
 
-    def test_auto_quote_on_confirm_disabled(self):
+    @patch('requests.request')
+    def test_auto_quote_on_confirm_disabled(self, mock_request):
         self.env['ir.config_parameter'].sudo().set_param(
             'arc_delivery_dhl.auto_quote_enabled', 'False'
         )
@@ -200,6 +201,7 @@ class TestArcDhlSaleOrder(TransactionCase):
         )
         self.assertFalse(freight_line)
         self.assertFalse(order.arc_dhl_price_quote_id)
+        mock_request.assert_not_called()
 
     @patch('requests.request')
     def test_auto_quote_failure_does_not_block_confirm(self, mock_request):

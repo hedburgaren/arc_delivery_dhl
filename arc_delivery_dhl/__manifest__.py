@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ARC Delivery DHL',
-    'version': '18.0.1.2.0',
+    'version': '18.0.1.3.0',
     'author': 'ARC Gruppen AB',
     'maintainer': 'Chrille Hedberg',
     'maintainer_email': 'chrille.hedberg@arcgruppen.se',

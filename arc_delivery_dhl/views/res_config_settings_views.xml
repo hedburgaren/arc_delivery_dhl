@@ -43,6 +43,10 @@
                                 <field name="arc_dhl_tracking_enabled"/>
                                 <label for="arc_dhl_tracking_enabled" class="o_form_label"/>
                             </div>
+                            <div class="mt16">
+                                <field name="arc_dhl_auto_quote_enabled"/>
+                                <label for="arc_dhl_auto_quote_enabled" class="o_form_label"/>
+                            </div>
                         </div>
                     </div>
                 </div>

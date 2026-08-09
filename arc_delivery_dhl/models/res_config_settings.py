@@ -42,6 +42,12 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='arc_delivery_dhl.tracking_enabled',
         help='Show DHL tracking links on deliveries.',
     )
+    arc_dhl_auto_quote_enabled = fields.Boolean(
+        string='DHL automatic freight quote',
+        config_parameter='arc_delivery_dhl.auto_quote_enabled',
+        help='Automatically request a DHL freight quote and add a freight line '
+             'when confirming a quotation/order.',
+    )
     arc_dhl_customer_number = fields.Char(
         string='DHL customer number',
         config_parameter='arc_delivery_dhl.customer_number',

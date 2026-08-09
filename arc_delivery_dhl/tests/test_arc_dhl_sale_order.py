@@ -163,3 +163,61 @@ class TestArcDhlSaleOrder(TransactionCase):
         )
         self.assertEqual(len(freight_line), 1)
         self.assertAlmostEqual(freight_line.price_unit, 197.82, places=2)
+
+    @patch('requests.request')
+    def test_auto_quote_on_confirm_enabled(self, mock_request):
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.ok = True
+        mock_request.return_value.json.return_value = self._quote_response()
+        mock_request.return_value.text = ''
+
+        self.env['ir.config_parameter'].sudo().set_param(
+            'arc_delivery_dhl.auto_quote_enabled', 'True'
+        )
+        order = self._create_order()
+        self._confirm_proposal(order)
+        order.action_confirm()
+
+        self.assertEqual(order.state, 'sale')
+        freight_line = order.order_line.filtered(
+            lambda l: l.product_id == self.freight_product
+        )
+        self.assertEqual(len(freight_line), 1)
+        self.assertAlmostEqual(freight_line.price_unit, 197.82, places=2)
+        self.assertTrue(order.arc_dhl_price_quote_id)
+
+    def test_auto_quote_on_confirm_disabled(self):
+        self.env['ir.config_parameter'].sudo().set_param(
+            'arc_delivery_dhl.auto_quote_enabled', 'False'
+        )
+        order = self._create_order()
+        self._confirm_proposal(order)
+        order.action_confirm()
+
+        self.assertEqual(order.state, 'sale')
+        freight_line = order.order_line.filtered(
+            lambda l: l.product_id == self.freight_product
+        )
+        self.assertFalse(freight_line)
+        self.assertFalse(order.arc_dhl_price_quote_id)
+
+    @patch('requests.request')
+    def test_auto_quote_failure_does_not_block_confirm(self, mock_request):
+        mock_request.return_value.status_code = 400
+        mock_request.return_value.ok = False
+        mock_request.return_value.json.return_value = {'error': 'Bad request'}
+        mock_request.return_value.text = 'Bad request'
+
+        self.env['ir.config_parameter'].sudo().set_param(
+            'arc_delivery_dhl.auto_quote_enabled', 'True'
+        )
+        order = self._create_order()
+        self._confirm_proposal(order)
+        order.action_confirm()
+
+        self.assertEqual(order.state, 'sale')
+        freight_line = order.order_line.filtered(
+            lambda l: l.product_id == self.freight_product
+        )
+        self.assertFalse(freight_line)
+        self.assertFalse(order.arc_dhl_price_quote_id)

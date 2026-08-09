@@ -4,7 +4,7 @@
 
 `arc_delivery_dhl` is the DHL Freight Sweden delivery carrier integration for the ARC Industrial Suite (Odoo 18 CE). It adds a `delivery.carrier` implementation (`delivery_type='dhl_freight_se'`) and supporting models for product selection, price quotes, shipment booking and label retrieval.
 
-Module version: `__manifest__.py:4` (`18.0.1.2.0`).
+Module version: `__manifest__.py:4` (`18.0.1.3.0`).
 Depends on `arc_industrial_ops`, `delivery`, `stock` and `mail`.
 
 ## API: Swedish DHL Freight API Farm
@@ -102,6 +102,7 @@ Config parameters:
 - `arc_delivery_dhl.visualcutter_enabled` - show DHL prices in VisualCutter.
 - `arc_delivery_dhl.booking_enabled` - allow shipment booking from pickings.
 - `arc_delivery_dhl.tracking_enabled` - show tracking links.
+- `arc_delivery_dhl.auto_quote_enabled` - automatically request a DHL freight quote and add a freight line when a quotation/order is confirmed.
 - `arc_delivery_dhl.customer_number` - DHL Freight customer number (avtalsnummer). Required for booking; sent as the consignor party identifier.
 
 Environment fallbacks:
@@ -129,6 +130,7 @@ Fields added to `sale.order`:
 Actions:
 - `action_arc_dhl_quote()` - requires a confirmed `arc.package.proposal`, selects a DHL product, creates an `arc.dhl.price.quote`, calls the DHL PriceQuote API and stores the result. Also sets `carrier_id` to the configured DHL carrier.
 - `action_arc_dhl_apply_shipping()` - adds or updates a sale order line using the service product named "Frakt", priced at `arc_dhl_shipping_cost`. Existing freight lines are updated instead of duplicated.
+- `action_confirm()` (override) - when `arc_delivery_dhl.auto_quote_enabled` is set, the order is in draft/sent state and a confirmed packing proposal exists, automatically calls `action_arc_dhl_quote()` and `action_arc_dhl_apply_shipping()` before the order is confirmed. Failures are logged as warnings and do not block confirmation.
 
 UI additions are in `views/sale_order_views.xml`: buttons next to "Calculate packaging", a stat button showing the DHL freight cost and a "DHL Freight" notebook page.
 

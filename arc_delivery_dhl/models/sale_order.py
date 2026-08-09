@@ -182,9 +182,9 @@ class SaleOrder(models.Model):
     def _arc_dhl_auto_quote_enabled(self):
         """Return True if this order should auto-request a DHL freight quote."""
         self.ensure_one()
-        if not self.env['ir.config_parameter'].sudo().get_param(
+        if self.env['ir.config_parameter'].sudo().get_param(
             'arc_delivery_dhl.auto_quote_enabled'
-        ):
+        ) != 'True':
             return False
         if self.state not in ('draft', 'sent'):
             return False

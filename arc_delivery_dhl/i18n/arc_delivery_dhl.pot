@@ -251,6 +251,30 @@ msgid "DHL API returned error %(status)s: %(message)s"
 msgstr ""
 
 #. module: arc_delivery_dhl
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,field_description:arc_delivery_dhl.field_res_config_settings__arc_dhl_auto_quote_enabled
+msgid "DHL automatic freight quote"
+msgstr ""
+
+#. module: arc_delivery_dhl
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_mode_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_b2b_order_workflow_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_catalogue_creator_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_cpp_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_dashboard_widget_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_arc_tech_settings__arc_dhl_auto_quote_enabled
+#: model:ir.model.fields,help:arc_delivery_dhl.field_res_config_settings__arc_dhl_auto_quote_enabled
+msgid ""
+"Automatically request a DHL freight quote and add a freight line "
+"when confirming a quotation/order."
+msgstr ""
+
+#. module: arc_delivery_dhl
 #: model_terms:ir.ui.view,arch_db:arc_delivery_dhl.arc_dhl_booking_form_view
 msgid "DHL Booking"
 msgstr ""

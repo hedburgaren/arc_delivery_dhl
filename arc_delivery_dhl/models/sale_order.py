@@ -178,3 +178,43 @@ class SaleOrder(models.Model):
             'quote': self.arc_dhl_price_quote_id.name,
         })
         return True
+
+    def _arc_dhl_auto_quote_enabled(self):
+        """Return True if this order should auto-request a DHL freight quote."""
+        self.ensure_one()
+        if not self.env['ir.config_parameter'].sudo().get_param(
+            'arc_delivery_dhl.auto_quote_enabled'
+        ):
+            return False
+        if self.state not in ('draft', 'sent'):
+            return False
+        if not self._arc_dhl_carrier():
+            return False
+        proposal = self.env['arc.package.proposal'].search([
+            ('sale_order_id', '=', self.id),
+            ('state', '=', 'confirmed'),
+        ], limit=1, order='create_date desc')
+        if not proposal or proposal.error_message:
+            return False
+        return True
+
+    def _arc_dhl_auto_quote_and_apply(self):
+        """Ensure a fresh DHL quote exists and add it as a freight line."""
+        self.ensure_one()
+        quote = self.arc_dhl_price_quote_id
+        if not quote or quote.state != 'quoted':
+            self.action_arc_dhl_quote()
+        if self.arc_dhl_price_quote_id and self.arc_dhl_price_quote_id.state == 'quoted':
+            self.action_arc_dhl_apply_shipping()
+
+    def action_confirm(self):
+        """Auto-request DHL freight quote before confirming, if enabled."""
+        for order in self:
+            if order._arc_dhl_auto_quote_enabled():
+                try:
+                    order._arc_dhl_auto_quote_and_apply()
+                except Exception as e:
+                    _logger.warning(
+                        'DHL auto-quote failed for %s: %s', order.name, e
+                    )
+        return super().action_confirm()

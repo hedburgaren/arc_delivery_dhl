@@ -39,18 +39,19 @@ class ArcDhlVisualCutterAdapter(models.AbstractModel):
                 quote_result.get('error_message') or _('DHL quote failed.')
             )
 
-        shipping_fee = quote_result.get('price', 0.0)
+        # Add the agreed ~20% margin: sell price = DHL cost / 0.8.
+        shipping_fee = round(quote_result.get('price', 0.0) / 0.8, 2)
         return {
             'shipping_fee': shipping_fee,
             'shipping_info': {
                 'rule_name': 'DHL Freight Sweden',
                 'breakdown': quote_result,
             },
-            # Packaging is intentionally kept at 0 here; it is handled by the
-            # WP2 packaging engine / arc.frakt.engine separately until that
-            # engine is replaced as well.
+            # The adapter only prices freight. The caller
+            # (apply_shipping_and_packaging) fills in the packaging fee from
+            # arc.frakt.engine; these defaults apply if that engine is missing.
             'packaging_fee': 0.0,
-            'packaging_info': {'rule_name': _('Handled by packaging engine')},
+            'packaging_info': {'reason': 'packaging_engine_unavailable'},
         }
 
     @api.model
@@ -61,7 +62,8 @@ class ArcDhlVisualCutterAdapter(models.AbstractModel):
         if total_weight <= 0:
             return []
 
-        # Use the source sheet/rod dimensions as the shipment package dims.
+        # The caller passes the stacked CUT-piece dimensions in the source_*
+        # fields (see _apply_dhl_shipping); the raw sheet is never shipped.
         if fmt == 'plate':
             length_cm = batch_result.get('source_length', 1) / 10.0
             width_cm = batch_result.get('source_width', 1) / 10.0

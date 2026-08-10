@@ -49,7 +49,8 @@ class TestArcDhlVisualCutterAdapter(TransactionCase):
         result = self.env['arc.dhl.visualcutter.adapter'].quote_for_batch(
             batch, {'country_code': 'SE', 'zip': '11122'},
         )
-        self.assertEqual(result['shipping_fee'], 175.0)
+        # DHL cost 175.00 SEK; sell price includes the 20% margin: 175 / 0.8.
+        self.assertEqual(result['shipping_fee'], 218.75)
         self.assertEqual(result['shipping_info']['rule_name'], 'DHL Freight Sweden')
         self.assertEqual(mock_request.call_count, 1)
 

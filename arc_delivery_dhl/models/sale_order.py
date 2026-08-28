@@ -108,8 +108,10 @@ class SaleOrder(models.Model):
             'arc_dhl_price_quote_id': quote.id,
             'carrier_id': carrier.id,
         })
+        self.action_arc_dhl_apply_shipping()
         self.message_post(body=_(
-            'DHL freight quote %(quote)s received: %(cost)s excl. VAT (%(cost_incl)s incl. VAT).'
+            'DHL freight quote %(quote)s received: %(cost)s excl. VAT (%(cost_incl)s incl. VAT). '
+            'Freight line added to the order.'
         ) % {
             'quote': quote.name,
             'cost': self.currency_id.format(self.arc_dhl_shipping_cost),
@@ -117,12 +119,22 @@ class SaleOrder(models.Model):
         })
 
         return {
-            'type': 'ir.actions.act_window',
-            'name': _('DHL Price Quote'),
-            'res_model': 'arc.dhl.price.quote',
-            'res_id': quote.id,
-            'view_mode': 'form',
-            'target': 'current',
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('DHL Freight Added'),
+                'message': _(
+                    'Freight cost: %(cost)s excl. VAT (%(cost_incl)s incl. VAT).'
+                ) % {
+                    'cost': self.currency_id.format(self.arc_dhl_shipping_cost),
+                    'cost_incl': self.currency_id.format(self.arc_dhl_shipping_cost_incl_vat),
+                },
+                'type': 'success',
+                'sticky': False,
+                'next': {
+                    'type': 'ir.actions.act_window_close',
+                },
+            },
         }
 
     def action_arc_dhl_apply_shipping(self):
@@ -137,14 +149,12 @@ class SaleOrder(models.Model):
                 'Request a DHL freight quote before adding the freight line.'
             ))
 
-        freight_template = self.env['product.template'].sudo().search([
-            ('name', '=', 'Frakt'),
-            ('type', '=', 'service'),
+        freight_product = self.env['product.product'].sudo().search([
+            ('default_code', '=', 'FRAKT'),
         ], limit=1)
-        freight_product = freight_template.product_variant_id if freight_template else self.env['product.product']
         if not freight_product:
             raise UserError(_(
-                'No service product named "Frakt" was found. Create one to use '
+                'No service product with SKU "FRAKT" was found. Create one to use '
                 'as the freight line.'
             ))
 

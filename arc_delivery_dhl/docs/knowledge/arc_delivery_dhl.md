@@ -4,7 +4,7 @@
 
 `arc_delivery_dhl` is the DHL Freight Sweden delivery carrier integration for the ARC Industrial Suite (Odoo 18 CE). It adds a `delivery.carrier` implementation (`delivery_type='dhl_freight_se'`) and supporting models for product selection, price quotes, shipment booking and label retrieval.
 
-Module version: `__manifest__.py:4` (`18.0.1.3.0`).
+Module version: `__manifest__.py:4` (`18.0.1.3.1`).
 Depends on `arc_industrial_ops`, `delivery`, `stock` and `mail`.
 
 ## API: Swedish DHL Freight API Farm
@@ -114,8 +114,9 @@ Environment fallbacks:
 - `data/arc_dhl_sequence_data.xml` - sequences for quotes and bookings.
 - `data/arc_dhl_product_data.xml` - seed DHL products.
 - `data/arc_dhl_product_rule_data.xml` - seed product selection rules.
-- `data/arc_dhl_parameter_data.xml` - default config parameters.
+- `data/arc_dhl_parameter_data.xml` - default config parameters (the sandbox/production switch; 18.0.1.3.1, task 191, removed the seeded `arc_delivery_dhl.request_timeout` 30: nothing read it, the live timeout is the `DEFAULT_TIMEOUT` constant in `models/arc_dhl_request_mixin.py`).
 - `migrations/18.0.1.1.0/` and `migrations/18.0.1.2.0/` - historical migrations.
+- `migrations/18.0.1.3.1/post-migration.py` - task 191: exports the old `arc_delivery_dhl.request_timeout` row (key and value) to `/var/log/odoo/task191-dead-settings/` and then deletes it; the seed row was `noupdate=1`, so it would otherwise survive the upgrade.
 
 ## Backend sale.order flow
 

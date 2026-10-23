@@ -5,9 +5,4 @@
         <field name="key">arc_delivery_dhl.is_production</field>
         <field name="value">False</field>
     </record>
-
-    <record id="arc_dhl_param_timeout" model="ir.config_parameter">
-        <field name="key">arc_delivery_dhl.request_timeout</field>
-        <field name="value">30</field>
-    </record>
 </odoo>

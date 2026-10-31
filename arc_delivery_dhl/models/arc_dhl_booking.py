@@ -315,13 +315,14 @@ class ArcDhlBooking(models.Model):
         total_weight = 0.0
         total_volume = 0.0
         total_pieces = 0
+        total_pallet_places = 0
         for idx, pkg in enumerate(packages, start=1):
             length = max(round(pkg['length_cm'], 1), mins['length'])
             width = max(round(pkg['width_cm'], 1), mins['width'])
             height = max(round(pkg['height_cm'], 1), mins['height'])
             weight = round(pkg['weight_kg'], 2)
             volume = round(length * width * height / 1_000_000.0, 4)
-            piece_lines.append({
+            piece = {
                 'numberOfPieces': 1,
                 'weight': weight,
                 'volume': volume,
@@ -329,7 +330,12 @@ class ArcDhlBooking(models.Model):
                 'height': height,
                 'length': length,
                 'stackable': bool(pkg.get('stackable', True)),
-            })
+            }
+            package_type = product._arc_dhl_package_type(length, width)
+            if package_type:
+                piece['packageType'] = package_type
+                total_pallet_places += 1
+            piece_lines.append(piece)
             total_weight += weight
             total_volume += volume
             total_pieces += 1
@@ -345,7 +351,7 @@ class ArcDhlBooking(models.Model):
             'totalWeight': round(total_weight, 2),
             'totalVolume': round(total_volume, 4),
             'totalLoadingMeters': 0,
-            'totalPalletPlaces': 0,
+            'totalPalletPlaces': total_pallet_places,
             'references': [
                 {
                     'qualifier': 'CU',
@@ -357,6 +363,9 @@ class ArcDhlBooking(models.Model):
                     'type': 'Consignor',
                     'id': customer_number[:15],
                     'name': (company.name or '')[:35],
+                    # DHL requires contactName whenever phone or email is
+                    # sent (sandbox 2026-10-31, error 22001).
+                    'contactName': (company.name or '')[:35],
                     'address': {
                         'street': (company.street or '')[:35],
                         'cityName': (company.city or '')[:35],
@@ -369,6 +378,7 @@ class ArcDhlBooking(models.Model):
                 {
                     'type': 'Consignee',
                     'name': (partner.name or '')[:35],
+                    'contactName': (partner.name or '')[:35],
                     'address': _dhl_address(partner),
                     'phone': (partner.phone or partner.mobile or '')[:64],
                     'email': (partner.email or '')[:64],

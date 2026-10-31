@@ -294,6 +294,15 @@ class ArcDhlPriceQuote(models.Model):
             number_of_pieces = int(pkg.get('number_of_pieces', 1)) or 1
             pallet_places = pkg.get('pallet_places', 0)
             is_stackable = pkg.get('stackable', True)
+            # Pallet products are priced per full or half pallet; with the
+            # generic CLL type DHL returned 0,00 for DHL PALL (sandbox
+            # 2026-10-31, task 88).
+            package_type = pkg.get('package_type') or (
+                self.product_id._arc_dhl_package_type(length_cm, width_cm)
+                if self.product_id else None
+            )
+            if package_type and package_type != 'CLL' and not pallet_places:
+                pallet_places = 1
 
             piece_lines.append({
                 'numberOfPieces': number_of_pieces,
@@ -305,7 +314,7 @@ class ArcDhlPriceQuote(models.Model):
                 'height': round(height_cm, 1),
                 'length': round(length_cm, 1),
                 'stackable': is_stackable,
-                'packageType': pkg.get('package_type') or 'CLL',
+                'packageType': package_type or 'CLL',
             })
             total_weight += weight * number_of_pieces
             total_volume += volume * number_of_pieces

@@ -157,3 +157,11 @@ Key test files:
 - `tests/test_arc_dhl_booking.py` - booking validation and label creation.
 - `tests/test_arc_dhl_product_rule.py` - product selection rules.
 - `tests/test_arc_dhl_sale_order.py` - backend order freight quote and freight line creation.
+
+## Customer delivery date from tracking (task 426, 18.0.1.4.0)
+
+`models/purchase_order.py` and the cron in `data/arc_dhl_customer_delivery_cron.xml` (every 2 hours, the interval is editable on the cron) fill `purchase.order.arc_customer_delivery_date` in `arc_industrial_ops` with source `dhl`.
+
+- **API**: the Swedish API Farm has no tracking. The cron uses Shipment Tracking - Unified (`https://api-eu.dhl.com/track/shipments`), which needs its own key from developer.dhl.com: `arc_delivery_dhl.tracking_api_key`, or `DHL_TRACKING_API_KEY`. Without a key it logs and does nothing. **The key does not exist yet, and the parser is not checked against a live response: do that before relying on it in production.**
+- **Selection**: confirmed orders with no date, at most 60 days old, with a dropship picking carrying `carrier_tracking_ref` and a DHL carrier or booking. Longest unchecked first (`arc_dhl_tracking_checked_at`), batch `arc_delivery_dhl.tracking_batch` (default 20; the base plan allows 250 calls a day).
+- **Writing**: every tracking number on the order must be delivered, and the latest day counts, in Europe/Stockholm. `_arc_dhl_tracking_is_live()` is strict on purpose (`force_environment` = production, or `is_production` in 1/true), because the seeded `is_production` value "False" is a truthy string in `_arc_dhl_get_environment`. Outside production it logs and writes nothing. A manual date is never overwritten. Each order runs in a savepoint; HTTP 429 stops the run.

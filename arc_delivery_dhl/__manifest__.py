@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ARC Delivery DHL',
-    'version': '18.0.1.3.1',
+    'version': '18.0.1.4.0',
     'author': 'ARC Gruppen AB',
     'maintainer': 'Chrille Hedberg',
     'maintainer_email': 'chrille.hedberg@arcgruppen.se',
@@ -38,6 +38,7 @@ authenticate with a Client-Key header.
         'data/arc_dhl_product_data.xml',
         'data/arc_dhl_product_rule_data.xml',
         'data/arc_dhl_parameter_data.xml',
+        'data/arc_dhl_customer_delivery_cron.xml',  # task 426
         'views/delivery_carrier_views.xml',
         'views/res_config_settings_views.xml',
         'views/stock_picking_views.xml',

@@ -42,6 +42,13 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='arc_delivery_dhl.tracking_enabled',
         help='Show DHL tracking links on deliveries.',
     )
+    arc_dhl_tracking_api_key = fields.Char(
+        string='DHL tracking API key',
+        config_parameter='arc_delivery_dhl.tracking_api_key',
+        help='Key for DHL Shipment Tracking - Unified (developer.dhl.com), a '
+             'separate service from the API Farm. Used by the cron that fills '
+             'in the customer delivery date.',
+    )
     arc_dhl_auto_quote_enabled = fields.Boolean(
         string='DHL automatic freight quote',
         config_parameter='arc_delivery_dhl.auto_quote_enabled',

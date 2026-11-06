@@ -18,6 +18,14 @@ class TestArcDhlSaleOrder(TransactionCase):
         cls.env['ir.config_parameter'].sudo().set_param(
             'arc_delivery_dhl.force_environment', 'sandbox'
         )
+        # The module seeds no carrier: the quote needs one to exist, which a
+        # configured database has and an empty one does not. The sibling
+        # tests create their own carrier the same way.
+        cls.carrier = cls.env['delivery.carrier'].create({
+            'name': 'DHL Test',
+            'delivery_type': 'dhl_freight_se',
+            'product_id': cls.env.ref('delivery.product_product_delivery').id,
+        })
         cls.partner = cls.env['res.partner'].create({
             'name': 'DHL SO Test Customer',
             'zip': '11122',
@@ -39,17 +47,18 @@ class TestArcDhlSaleOrder(TransactionCase):
         })
         cls.product = cls.product_tmpl.product_variant_id
 
-        # Ensure exactly one service product named "Frakt" exists for the model
-        # to find. Reuse an existing one if present.
-        existing_freight = cls.env['product.template'].sudo().search([
-            ('name', '=', 'Frakt'),
-            ('type', '=', 'service'),
+        # The model finds the freight line's product by SKU FRAKT since
+        # 9b9bc54 (before that, by the name Frakt). Reuse a product with that
+        # SKU if present, otherwise create one.
+        existing_freight = cls.env['product.product'].sudo().search([
+            ('default_code', '=', 'FRAKT'),
         ], limit=1)
         if existing_freight:
-            cls.freight_product = existing_freight.product_variant_id
+            cls.freight_product = existing_freight
         else:
             cls.freight_product = cls.env['product.product'].create({
                 'name': 'Frakt',
+                'default_code': 'FRAKT',
                 'type': 'service',
                 'list_price': 0.0,
                 'uom_id': cls.uom_unit.id,
@@ -114,7 +123,10 @@ class TestArcDhlSaleOrder(TransactionCase):
         self._confirm_proposal(order)
 
         action = order.action_arc_dhl_quote()
-        self.assertEqual(action['res_model'], 'arc.dhl.price.quote')
+        # Since 9b9bc54 the quote adds the freight line itself and answers with
+        # a success notification; it no longer opens the quote record.
+        self.assertEqual(action['tag'], 'display_notification')
+        self.assertEqual(action['params']['type'], 'success')
         self.assertTrue(order.arc_dhl_price_quote_id)
         self.assertAlmostEqual(order.arc_dhl_shipping_cost, 197.82, places=2)
         self.assertAlmostEqual(order.arc_dhl_shipping_cost_incl_vat, 247.28, places=2)

@@ -42,6 +42,20 @@ class SaleOrder(models.Model):
              'first matching DHL product from the confirmed packing proposal.',
     )
 
+    def _arc_dhl_to_order_currency(self, amount):
+        """Convert an amount from the latest quote's currency to the order's."""
+        self.ensure_one()
+        quote_currency = self.arc_dhl_price_quote_id.currency_id
+        if not amount or not quote_currency or not self.currency_id \
+                or quote_currency == self.currency_id:
+            return amount
+        return quote_currency._convert(
+            amount,
+            self.currency_id,
+            self.company_id or self.env.company,
+            self.date_order or fields.Date.context_today(self),
+        )
+
     def _arc_dhl_carrier(self):
         """Return the first DHL Freight Sweden carrier record."""
         return self.env['delivery.carrier'].sudo().search([
@@ -92,7 +106,8 @@ class SaleOrder(models.Model):
                 'dimensions, weight and destination country.'
             ))
 
-        quote = self.env['arc.dhl.price.quote'].create({
+        # SEC-B 138: users cannot create quotes; the module does it itself.
+        quote = self.env['arc.dhl.price.quote'].sudo().create({
             'carrier_id': carrier.id,
             'sale_order_id': self.id,
             'product_id': product.id,
@@ -109,13 +124,16 @@ class SaleOrder(models.Model):
             'carrier_id': carrier.id,
         })
         self.action_arc_dhl_apply_shipping()
+        cost = self._arc_dhl_to_order_currency(self.arc_dhl_shipping_cost)
+        cost_incl = self._arc_dhl_to_order_currency(
+            self.arc_dhl_shipping_cost_incl_vat)
         self.message_post(body=_(
             'DHL freight quote %(quote)s received: %(cost)s excl. VAT (%(cost_incl)s incl. VAT). '
             'Freight line added to the order.'
         ) % {
             'quote': quote.name,
-            'cost': self.currency_id.format(self.arc_dhl_shipping_cost),
-            'cost_incl': self.currency_id.format(self.arc_dhl_shipping_cost_incl_vat),
+            'cost': self.currency_id.format(cost),
+            'cost_incl': self.currency_id.format(cost_incl),
         })
 
         return {
@@ -126,8 +144,8 @@ class SaleOrder(models.Model):
                 'message': _(
                     'Freight cost: %(cost)s excl. VAT (%(cost_incl)s incl. VAT).'
                 ) % {
-                    'cost': self.currency_id.format(self.arc_dhl_shipping_cost),
-                    'cost_incl': self.currency_id.format(self.arc_dhl_shipping_cost_incl_vat),
+                    'cost': self.currency_id.format(cost),
+                    'cost_incl': self.currency_id.format(cost_incl),
                 },
                 'type': 'success',
                 'sticky': False,
@@ -158,8 +176,10 @@ class SaleOrder(models.Model):
                 'as the freight line.'
             ))
 
-        price = self.arc_dhl_shipping_cost
-        existing = self.order_line.filtered(
+        # SEC-B 128: the quote is in the currency DHL answered in; the line
+        # must be in the order currency.
+        price = self._arc_dhl_to_order_currency(self.arc_dhl_shipping_cost)
+        existing =self.order_line.filtered(
             lambda l: l.product_id == freight_product
         )[:1]
         if existing:
@@ -213,16 +233,23 @@ class SaleOrder(models.Model):
         self.ensure_one()
         quote = self.arc_dhl_price_quote_id
         if not quote or quote.state != 'quoted':
+            # SEC-B 130: action_arc_dhl_quote applies the freight line itself.
             self.action_arc_dhl_quote()
-        if self.arc_dhl_price_quote_id and self.arc_dhl_price_quote_id.state == 'quoted':
+        else:
             self.action_arc_dhl_apply_shipping()
 
     def action_confirm(self):
-        """Auto-request DHL freight quote before confirming, if enabled."""
+        """Auto-request DHL freight quote before confirming, if enabled.
+
+        SEC-B 130: the quote runs in a savepoint, so a failure half way
+        leaves no half-written quote or freight line. The HTTP call is still
+        synchronous (not moved to a queue).
+        """
         for order in self:
             if order._arc_dhl_auto_quote_enabled():
                 try:
-                    order._arc_dhl_auto_quote_and_apply()
+                    with self.env.cr.savepoint():
+                        order._arc_dhl_auto_quote_and_apply()
                 except Exception as e:
                     _logger.warning(
                         'DHL auto-quote failed for %s: %s', order.name, e

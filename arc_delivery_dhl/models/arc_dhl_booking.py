@@ -2,6 +2,9 @@
 """Shipment booking against DHL TransportInstruction API."""
 import json
 import logging
+
+from psycopg2 import errors as pg_errors
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
@@ -91,12 +94,40 @@ class ArcDhlBooking(models.Model):
         Returns a dict consumed by delivery.carrier.send_shipping().
         """
         self.ensure_one()
-        if self.state == 'booked':
+        # SEC-B 125: serialise concurrent booking of the same record. A second
+        # click or request fails fast instead of booking twice at DHL.
+        try:
+            with self.env.cr.savepoint(flush=False):
+                self.env.cr.execute(
+                    'SELECT id FROM arc_dhl_booking WHERE id = %s '
+                    'FOR UPDATE NOWAIT',
+                    (self.id,),
+                )
+        except pg_errors.LockNotAvailable as exc:
+            raise UserError(_(
+                'This DHL booking is being processed by someone else. '
+                'Wait a moment and check the booking before trying again.'
+            )) from exc
+        self.invalidate_recordset(['state', 'dhl_booking_id'])
+
+        if self.state == 'booked' or (
+            self.dhl_booking_id and self.state != 'cancelled'
+        ):
             return {
                 'success': True,
                 'price': self.price,
                 'tracking_numbers': self._tracking_numbers_list(),
             }
+        already_booked = self.search_count([
+            ('picking_id', '=', self.picking_id.id),
+            ('state', '=', 'booked'),
+            ('id', '!=', self.id),
+        ])
+        if already_booked:
+            raise UserError(_(
+                'This picking already has a booked DHL shipment. Cancel it '
+                'at DHL before booking again.'
+            ))
 
         picking = self.picking_id
         carrier = self.carrier_id
@@ -198,8 +229,16 @@ class ArcDhlBooking(models.Model):
             'dhl_tracking_numbers': ', '.join(tracking_numbers),
         })
 
-        # Fetch labels in a separate call.
-        label_result = self._arc_dhl_fetch_labels(payload, tracking_numbers)
+        # Fetch labels in a separate call. SEC-B 125: the shipment now exists
+        # at DHL, so a failure here must never roll back the booking id.
+        try:
+            with self.env.cr.savepoint():
+                label_result = self._arc_dhl_fetch_labels(
+                    payload, tracking_numbers)
+        except Exception as exc:  # pylint: disable=broad-except
+            _logger.error(
+                'DHL label handling failed for booking %s: %s', self.name, exc)
+            label_result = {'success': False, 'error_message': str(exc)}
         if not label_result.get('success'):
             self.message_post(body=label_result.get('error_message', ''))
 
@@ -504,4 +543,14 @@ class ArcDhlBooking(models.Model):
         ]
 
     def action_reset_to_draft(self):
+        # SEC-B 125: a booking that exists at DHL cannot be reset, or it could
+        # be booked twice. Only a booking cancelled at DHL may be reset.
+        for booking in self:
+            if booking.dhl_booking_id and booking.state != 'cancelled':
+                raise UserError(_(
+                    'Booking %(name)s already exists at DHL (%(id)s) and '
+                    'cannot be reset to draft. Cancel it at DHL first.',
+                    name=booking.name,
+                    id=booking.dhl_booking_id,
+                ))
         self.write({'state': 'draft'})

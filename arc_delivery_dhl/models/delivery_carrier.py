@@ -55,9 +55,13 @@ class DeliveryCarrier(models.Model):
             'product_id': product.id,
         })
         result = quote.action_request_quote()
+        # SEC-C 139: a missing or zero price is never a successful rate, even
+        # if an upstream path ever reports success with price 0.
+        price = result.get('price', 0.0)
+        success = bool(result.get('success', False)) and price > 0
         return {
-            'success': result.get('success', False),
-            'price': result.get('price', 0.0),
+            'success': success,
+            'price': price,
             'error_message': result.get('error_message', False),
             'warning_message': result.get('warning_message', False),
         }

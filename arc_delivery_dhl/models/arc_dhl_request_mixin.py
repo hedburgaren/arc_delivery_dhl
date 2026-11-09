@@ -14,6 +14,7 @@ import requests
 
 from odoo import _, api, models
 from odoo.exceptions import UserError
+from odoo.tools.misc import str2bool
 
 
 DEFAULT_TIMEOUT = 30
@@ -61,8 +62,14 @@ class ArcDhlRequestMixin(models.AbstractModel):
             return 'sandbox'
         if force_env == 'production':
             return 'production'
-        is_prod = param.get_param('arc_delivery_dhl.is_production')
-        return 'production' if is_prod else 'sandbox'
+        # SEC-B 121: the stored value is a string; "False" is truthy as a
+        # string. Parse it. Unknown or garbage values mean sandbox.
+        is_prod = param.get_param('arc_delivery_dhl.is_production') or ''
+        return (
+            'production'
+            if str2bool(str(is_prod).strip(), default=False)
+            else 'sandbox'
+        )
 
     @api.model
     def _arc_dhl_get_api_key(self):

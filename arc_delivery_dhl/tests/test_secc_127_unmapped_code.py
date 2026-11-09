@@ -23,12 +23,16 @@ class TestSecC127UnmappedCode(TransactionCase):
         cls.dhl_product = cls.env.ref('arc_delivery_dhl.dhl_product_paket')
         cls.special_product = cls.env.ref('arc_delivery_dhl.dhl_product_special')
 
-    def test_special_catchall_rule_is_not_seeded(self):
+    def test_special_catchall_rule_is_not_active(self):
+        # Fresh installs no longer get the rule at all; upgraded databases
+        # keep the (noupdate) row but migration 18.0.1.5.1 deactivates it.
+        rule = self.env.ref(
+            'arc_delivery_dhl.dhl_product_rule_special',
+            raise_if_not_found=False,
+        )
         self.assertFalse(
-            self.env.ref(
-                'arc_delivery_dhl.dhl_product_rule_special', raise_if_not_found=False
-            ),
-            'The SPECIAL catch-all rule must not be seeded any more.',
+            rule and rule.active,
+            'The SPECIAL catch-all rule must not be active.',
         )
 
     @patch('requests.request')

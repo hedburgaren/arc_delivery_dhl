@@ -137,7 +137,23 @@ class ArcDhlPriceQuote(models.Model):
                 'warning_message': False,
             }
 
-        payload = self._arc_dhl_build_quote_payload()
+        # SEC-C 127: an unmapped product code raises ValueError inside the
+        # payload builder. That is a configuration error, not a crash: it is
+        # reported as a failed quote like any other DHL error.
+        try:
+            payload = self._arc_dhl_build_quote_payload()
+        except ValueError as exc:
+            self.write({
+                'state': 'error',
+                'error_message': str(exc),
+                'cache_key': cache_key,
+            })
+            return {
+                'success': False,
+                'price': 0.0,
+                'error_message': str(exc),
+            }
+
         try:
             response = self.env['arc.dhl.request.mixin']._arc_dhl_request(
                 'post',

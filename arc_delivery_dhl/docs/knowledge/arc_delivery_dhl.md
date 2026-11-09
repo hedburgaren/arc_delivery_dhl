@@ -4,7 +4,7 @@
 
 `arc_delivery_dhl` is the DHL Freight Sweden delivery carrier integration for the ARC Industrial Suite (Odoo 18 CE). It adds a `delivery.carrier` implementation (`delivery_type='dhl_freight_se'`) and supporting models for product selection, price quotes, shipment booking and label retrieval.
 
-Module version: `__manifest__.py:4` (`18.0.1.3.1`).
+Module version: `__manifest__.py:4` (`18.0.1.5.0`).
 Depends on `arc_industrial_ops`, `delivery`, `stock` and `mail`.
 
 ## API: Swedish DHL Freight API Farm
@@ -164,4 +164,20 @@ Key test files:
 
 - **API**: the Swedish API Farm has no tracking. The cron uses Shipment Tracking - Unified (`https://api-eu.dhl.com/track/shipments`), which needs its own key from developer.dhl.com: `arc_delivery_dhl.tracking_api_key`, or `DHL_TRACKING_API_KEY`. Without a key it logs and does nothing. **The key does not exist yet, and the parser is not checked against a live response: do that before relying on it in production.**
 - **Selection**: confirmed orders with no date, at most 60 days old, with a dropship picking carrying `carrier_tracking_ref` and a DHL carrier or booking. Longest unchecked first (`arc_dhl_tracking_checked_at`), batch `arc_delivery_dhl.tracking_batch` (default 20; the base plan allows 250 calls a day).
-- **Writing**: every tracking number on the order must be delivered, and the latest day counts, in Europe/Stockholm. `_arc_dhl_tracking_is_live()` is strict on purpose (`force_environment` = production, or `is_production` in 1/true), because the seeded `is_production` value "False" is a truthy string in `_arc_dhl_get_environment`. Outside production it logs and writes nothing. A manual date is never overwritten. Each order runs in a savepoint; HTTP 429 stops the run.
+- **Writing**: every tracking number on the order must be delivered, and the latest day counts, in Europe/Stockholm. `_arc_dhl_tracking_is_live()` is strict on purpose (`force_environment` = production, or `is_production` in 1/true), because the seeded `is_production` value "False" was a truthy string in `_arc_dhl_get_environment` (fixed in 18.0.1.5.0, SEC-B 121; the check stays strict). Outside production it logs and writes nothing. A manual date is never overwritten. Each order runs in a savepoint; HTTP 429 stops the run.
+
+## SEC-B security and robustness fixes (18.0.1.5.0, 2026-11-09)
+
+Tests: `tests/test_arc_dhl_sec_b.py` and `test_121` in `tests/test_arc_dhl_request_mixin.py`. Numbers are the audit finding ids.
+
+- **121 environment**: `_arc_dhl_get_environment()` parses `is_production` with `odoo.tools.misc.str2bool(default=False)`. "True", "1", "true" mean production; "False", empty, missing or any unknown value mean sandbox. `force_environment` still wins.
+- **122 zero price**: a quote whose `TotalPrice` is missing or <= 0 gets state `error`, returns `success False` and is never served from the cache (the cache lookup also requires `price > 0`).
+- **123 no rule**: `dhl_freight_se_rate_shipment()` returns `success False` with an error message when no product rule matches (was success with price 0).
+- **124 cache key**: `_arc_dhl_quote_cache_key()` is a sha1 hex digest of a canonical JSON key: product, country, zip, weight, package count and every package (dimensions, weight, stackable). Old integer-hash keys never match, so the cache starts cold after the upgrade.
+- **125 booking**: `action_reset_to_draft()` refuses when `dhl_booking_id` is set and the state is not `cancelled`. `action_book_shipment()` takes `SELECT ... FOR UPDATE NOWAIT` on the booking row (a concurrent second call gets a UserError), returns the existing result when a DHL booking id exists, refuses when another booking on the same picking is `booked`, and wraps label fetching in a savepoint so a label failure never rolls back the booking id. Not done: committing the booking id in its own transaction right after DHL answers (a later crash in the same request can still lose it).
+- **128 currency**: `action_arc_dhl_apply_shipping()` converts the quote price from the quote currency to the order currency (`_arc_dhl_to_order_currency`). The 20 percent margin on the web path (`visualcutter_adapter`, price / 0.8) and none on the backend path is a business rule, not changed.
+- **130 auto quote**: `action_confirm()` runs the auto quote inside a savepoint and applies the freight line once (`action_arc_dhl_quote` already applies it). The HTTP call is still synchronous inside confirm, not moved to a queue.
+- **131 rule data**: `data/arc_dhl_product_rule_data.xml` is `noupdate="1"`. Migration `18.0.1.5.0` (pre and post) sets `noupdate=true` on the existing `arc.dhl.product.rule` rows in `ir_model_data`, so calibrations made in the UI survive later updates.
+- **133 public calculator**: inside this module only: the cache key normalises zip (no spaces, upper case), weight (0.1 kg) and dimensions (whole cm up), and the public path (`get_quote_for_packages`) uses a 10 s timeout (`WEB_TIMEOUT`, context key `arc_dhl_timeout`) instead of 30 s. The rate limit for anonymous callers belongs in the core module.
+- **135 booking price**: not changed. No price field appears in the known TransportInstruction response (code and tests), so `booking.price` stays 0 until the real response format is known.
+- **138 quote access**: `base.group_user` has read-only access to `arc.dhl.price.quote`. The module creates and writes quotes through `sudo()` (`sale.order.action_arc_dhl_quote`, `delivery.carrier.dhl_freight_se_rate_shipment`, `get_quote_for_packages`, `action_request_quote`). Any other code that creates quotes as a non-admin user must do the same.

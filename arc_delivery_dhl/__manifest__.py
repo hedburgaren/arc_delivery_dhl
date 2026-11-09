@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ARC Delivery DHL',
-    'version': '18.0.1.4.0',
+    # SEC-B 2026-11-09: security and robustness fixes (121-138), see docs/knowledge.
+    'version': '18.0.1.5.0',
     'author': 'ARC Gruppen AB',
     'maintainer': 'Chrille Hedberg',
     'maintainer_email': 'chrille.hedberg@arcgruppen.se',

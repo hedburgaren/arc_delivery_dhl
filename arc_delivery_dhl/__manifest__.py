@@ -40,6 +40,7 @@ authenticate with a Client-Key header.
         'data/arc_dhl_product_rule_data.xml',
         'data/arc_dhl_parameter_data.xml',
         'data/arc_dhl_customer_delivery_cron.xml',  # task 426
+        'data/arc_dhl_quote_purge_cron.xml',  # SEC-C 132
         'views/delivery_carrier_views.xml',
         'views/res_config_settings_views.xml',
         'views/stock_picking_views.xml',

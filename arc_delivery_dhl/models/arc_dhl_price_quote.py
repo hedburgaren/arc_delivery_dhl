@@ -119,15 +119,10 @@ class ArcDhlPriceQuote(models.Model):
         ], limit=1, order='create_date desc')
         if existing:
             _logger.info('DHL price quote cache hit for key %s', cache_key)
-            self.write({
-                'state': 'quoted',
-                'price': existing.price,
-                'price_incl_vat': existing.price_incl_vat,
-                'vat_amount': existing.vat_amount,
-                'currency_id': existing.currency_id.id,
-                'cache_key': cache_key,
-            })
-            return {
+            # SEC-C 132: a cache hit reuses the cached record instead of
+            # writing a duplicate row; the fresh record is removed and the
+            # result points at the cached one via quote_id.
+            result = {
                 'success': True,
                 'price': existing.price,
                 'price_incl_vat': existing.price_incl_vat,
@@ -135,7 +130,10 @@ class ArcDhlPriceQuote(models.Model):
                 # SEC-B 128: callers convert to the order's currency.
                 'currency_id': existing.currency_id.id,
                 'warning_message': False,
+                'quote_id': existing.id,
             }
+            self.unlink()
+            return result
 
         # SEC-C 127: an unmapped product code raises ValueError inside the
         # payload builder. That is a configuration error, not a crash: it is
@@ -211,6 +209,7 @@ class ArcDhlPriceQuote(models.Model):
             # SEC-B 128: callers convert to the order's currency.
             'currency_id': self.currency_id.id,
             'warning_message': False,
+            'quote_id': self.id,
         }
 
     @api.model
@@ -328,6 +327,29 @@ class ArcDhlPriceQuote(models.Model):
             )
         )
         return timedelta(hours=hours)
+
+    # SEC-C 132 ----------------------------------------------------------
+
+    def _arc_dhl_purge_old_quotes(self):
+        """Delete price quotes older than the retention window.
+
+        The quote table grows with every rate call. A daily cron removes
+        records past ``arc_delivery_dhl.quote_retention_days`` (default 30).
+        Orders that still link a purged quote lose the reference; the cost
+        figures on the order are historical anyway.
+        """
+        days = int(
+            self.env['ir.config_parameter'].sudo().get_param(
+                'arc_delivery_dhl.quote_retention_days', '30'
+            )
+        )
+        cutoff = fields.Datetime.now() - timedelta(days=days)
+        stale = self.sudo().search([('create_date', '<', cutoff)])
+        count = len(stale)
+        if count:
+            stale.unlink()
+        _logger.info('DHL price quote purge removed %s records.', count)
+        return count
 
     def _arc_dhl_price_quote_product_code(self):
         """Return the PriceQuote API enum value for the selected product."""

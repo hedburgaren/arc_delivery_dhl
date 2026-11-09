@@ -112,6 +112,9 @@ class SaleOrder(models.Model):
             'sale_order_id': self.id,
             'product_id': product.id,
         })
+        # SEC-C 132: on a cache hit the fresh record is removed and the
+        # result names the cached record to link instead.
+        fresh_quote_id = quote.id
         result = quote.action_request_quote()
         if not result.get('success'):
             raise UserError(
@@ -120,7 +123,7 @@ class SaleOrder(models.Model):
             )
 
         self.write({
-            'arc_dhl_price_quote_id': quote.id,
+            'arc_dhl_price_quote_id': result.get('quote_id') or fresh_quote_id,
             'carrier_id': carrier.id,
         })
         self.action_arc_dhl_apply_shipping()
@@ -131,7 +134,7 @@ class SaleOrder(models.Model):
             'DHL freight quote %(quote)s received: %(cost)s excl. VAT (%(cost_incl)s incl. VAT). '
             'Freight line added to the order.'
         ) % {
-            'quote': quote.name,
+            'quote': self.arc_dhl_price_quote_id.name,
             'cost': self.currency_id.format(cost),
             'cost_incl': self.currency_id.format(cost_incl),
         })

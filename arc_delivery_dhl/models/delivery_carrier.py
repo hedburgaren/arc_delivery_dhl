@@ -38,16 +38,18 @@ class DeliveryCarrier(models.Model):
         if not product:
             product = self.env['arc.dhl.product.selector'].select_for_order(order)
         if not product:
+            # SEC-B 123: no rule means no price. Never a silent 0 as success.
             return {
-                'success': True,
+                'success': False,
                 'price': 0.0,
-                'error_message': False,
-                'warning_message': _(
+                'error_message': _(
                     'No DHL product rule matches this order; manual product '
                     'selection required.'
                 ),
+                'warning_message': False,
             }
-        quote = self.env['arc.dhl.price.quote'].create({
+        # SEC-B 138: users cannot create quotes; the module does it itself.
+        quote = self.env['arc.dhl.price.quote'].sudo().create({
             'carrier_id': self.id,
             'sale_order_id': order.id,
             'product_id': product.id,

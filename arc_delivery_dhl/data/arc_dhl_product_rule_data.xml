@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="0">
+<odoo noupdate="1">
     <!-- DHL product selection rules.
          Rules are evaluated in sequence order; the first matching rule wins.
-         Calibrate weights and dimensions in the UI. -->
+         Calibrate weights and dimensions in the UI.
+         SEC-B 131 (2026-11-09): noupdate="1", so a module update no longer
+         overwrites calibrations made in the UI. Existing installs have these
+         records marked noupdate=false in ir_model_data; migration 18.0.1.5.0
+         flips them. -->
 
     <record id="dhl_product_rule_paket" model="arc.dhl.product.rule">
         <field name="name">DHL PAKET</field>

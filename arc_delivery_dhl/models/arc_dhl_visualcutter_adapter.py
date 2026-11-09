@@ -8,7 +8,7 @@ frontend code keeps working.
 """
 import logging
 
-from odoo import _, api, models
+from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -23,9 +23,13 @@ class ArcDhlVisualCutterAdapter(models.AbstractModel):
 
         :param batch_result: dict from ``_vc_calculate_batch`` containing
             cut_weight_kg, format, source_length/width/thickness etc.
-        :param partner_vals: dict with ``country_code`` and ``zip``.
+        :param partner_vals: dict with ``country_code`` and ``zip``, and
+            optionally ``currency_id``: the order's currency (res.currency
+            id). The fee is returned in that currency, else in the company
+            currency (Chrille 2026-11-09, SEC-B 128: EUR orders get EUR
+            freight).
         :return: dict with ``shipping_fee``, ``shipping_info``,
-                 ``packaging_fee`` and ``packaging_info`` keys.
+                 ``packaging_fee``, ``packaging_info`` and ``currency`` keys.
         """
         packages = self._batch_to_packages(batch_result)
         if not packages:
@@ -40,9 +44,13 @@ class ArcDhlVisualCutterAdapter(models.AbstractModel):
             )
 
         # Add the agreed ~20% margin: sell price = DHL cost / 0.8.
-        shipping_fee = round(quote_result.get('price', 0.0) / 0.8, 2)
+        target = self._arc_target_currency(partner_vals)
+        cost = self._arc_to_currency(
+            quote_result.get('price', 0.0), quote_result.get('currency_id'), target)
+        shipping_fee = round(cost / 0.8, 2)
         return {
             'shipping_fee': shipping_fee,
+            'currency': target.name,
             'shipping_info': {
                 'rule_name': 'DHL Freight Sweden',
                 'breakdown': quote_result,
@@ -53,6 +61,25 @@ class ArcDhlVisualCutterAdapter(models.AbstractModel):
             'packaging_fee': 0.0,
             'packaging_info': {'reason': 'packaging_engine_unavailable'},
         }
+
+    @api.model
+    def _arc_target_currency(self, partner_vals):
+        """The order's currency when the caller names it, else the company's."""
+        currency_id = (partner_vals or {}).get('currency_id')
+        currency = self.env['res.currency'].sudo().browse(currency_id).exists() \
+            if currency_id else self.env['res.currency']
+        return currency or self.env.company.currency_id
+
+    @api.model
+    def _arc_to_currency(self, amount, from_currency_id, target):
+        """Convert a DHL amount from the quote's currency to ``target``."""
+        source = self.env['res.currency'].sudo().browse(from_currency_id).exists() \
+            if from_currency_id else self.env['res.currency']
+        source = source or self.env.company.currency_id
+        if not amount or source == target:
+            return amount or 0.0
+        return source._convert(
+            amount, target, self.env.company, fields.Date.context_today(self))
 
     @api.model
     def _batch_to_packages(self, batch_result):

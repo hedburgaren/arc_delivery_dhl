@@ -42,6 +42,28 @@ class TestArcDhlRequestMixin(TransactionCase):
             key = self.env['arc.dhl.request.mixin']._arc_dhl_get_api_key()
         self.assertEqual(key, 'settings-key')
 
+    def test_is_production_parsing_sec_b_121(self):
+        """SEC-B 121: the string "False" must not read as production."""
+        param = self.env['ir.config_parameter'].sudo()
+        param.set_param('arc_delivery_dhl.force_environment', '')
+        mixin = self.env['arc.dhl.request.mixin']
+        cases = {
+            'False': 'sandbox', 'false': 'sandbox', '0': 'sandbox',
+            'no': 'sandbox', 'garbage': 'sandbox', 'maybe': 'sandbox',
+            'True': 'production', 'true': 'production', '1': 'production',
+        }
+        for value, expected in cases.items():
+            param.set_param('arc_delivery_dhl.is_production', value)
+            self.assertEqual(
+                mixin._arc_dhl_get_environment(), expected,
+                'is_production=%r' % value,
+            )
+        # Missing parameter: sandbox.
+        self.env['ir.config_parameter'].sudo().search([
+            ('key', '=', 'arc_delivery_dhl.is_production'),
+        ]).unlink()
+        self.assertEqual(mixin._arc_dhl_get_environment(), 'sandbox')
+
     def test_missing_key_raises_user_error(self):
         from odoo.addons.arc_delivery_dhl.models import arc_dhl_request_mixin
 

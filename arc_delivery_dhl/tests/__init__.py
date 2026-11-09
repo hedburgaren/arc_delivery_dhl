@@ -5,4 +5,5 @@ from . import test_arc_dhl_price_quote
 from . import test_arc_dhl_product_rule
 from . import test_arc_dhl_request_mixin
 from . import test_arc_dhl_sale_order
+from . import test_arc_dhl_sec_b
 from . import test_arc_dhl_visualcutter_adapter

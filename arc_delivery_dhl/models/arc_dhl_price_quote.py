@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
 """DHL Freight Price Quote API integration with caching."""
+import hashlib
 import json
 import logging
+import math
+import re
 from datetime import timedelta
 
 from odoo import _, api, fields, models
 
+from .arc_dhl_request_mixin import DEFAULT_TIMEOUT
+
 _logger = logging.getLogger(__name__)
+
+# SEC-B 133: the public calculator path uses a shorter timeout so that a slow
+# DHL answer holds a worker for less time than the 30 s backend default.
+WEB_TIMEOUT = 10
 
 
 # Mapping from Product API / rule codes to the string enum values used by the
@@ -98,10 +107,14 @@ class ArcDhlPriceQuote(models.Model):
     def action_request_quote(self):
         """Request a price quote, using cache when available."""
         self.ensure_one()
+        # SEC-B 138: internal users have read-only access to quotes. All
+        # writes happen here, inside the module's own code path.
+        self = self.sudo()
         cache_key = self._arc_dhl_quote_cache_key()
         existing = self.search([
             ('cache_key', '=', cache_key),
             ('state', '=', 'quoted'),
+            ('price', '>', 0),  # SEC-B 122: a zero price is never served
             ('create_date', '>=', fields.Datetime.now() - self._cache_ttl()),
         ], limit=1, order='create_date desc')
         if existing:
@@ -119,6 +132,8 @@ class ArcDhlPriceQuote(models.Model):
                 'price': existing.price,
                 'price_incl_vat': existing.price_incl_vat,
                 'vat_amount': existing.vat_amount,
+                # SEC-B 128: callers convert to the order's currency.
+                'currency_id': existing.currency_id.id,
                 'warning_message': False,
             }
 
@@ -128,6 +143,7 @@ class ArcDhlPriceQuote(models.Model):
                 'post',
                 '/pricequoteapi/v1/pricequote/quoteforgrossprice',
                 payload=payload,
+                timeout=self.env.context.get('arc_dhl_timeout', DEFAULT_TIMEOUT),
             )
         except Exception as exc:  # pylint: disable=broad-except
             _logger.error('DHL price quote failed: %s', exc)
@@ -147,6 +163,20 @@ class ArcDhlPriceQuote(models.Model):
         price_incl_vat = self._arc_dhl_extract_price(response, 'TotalPriceIncVAT')
         vat_amount = self._arc_dhl_extract_price(response, 'VAT')
         currency = self._arc_dhl_extract_currency(response)
+        if price <= 0:
+            # SEC-B 122: no TotalPrice line, or a zero price, is an error and
+            # is never cached (the cache only serves state 'quoted').
+            msg = _('DHL returned no usable price for this shipment.')
+            self.write({
+                'state': 'error',
+                'error_message': msg,
+                'cache_key': cache_key,
+            })
+            return {
+                'success': False,
+                'price': 0.0,
+                'error_message': msg,
+            }
         vals = {
             'state': 'quoted',
             'price': price,
@@ -162,6 +192,8 @@ class ArcDhlPriceQuote(models.Model):
             'price': price,
             'price_incl_vat': price_incl_vat,
             'vat_amount': vat_amount,
+            # SEC-B 128: callers convert to the order's currency.
+            'currency_id': self.currency_id.id,
             'warning_message': False,
         }
 
@@ -205,39 +237,72 @@ class ArcDhlPriceQuote(models.Model):
             }
             for p in packages
         ]
-        quote = self.create({
+        quote = self.sudo().create({  # SEC-B 138: users cannot create quotes
             'carrier_id': carrier.id if carrier else False,
             'product_id': product.id,
             'partner_country_code': country_code,
             'partner_zip': zip_code,
             'package_json': json.dumps(package_list),
         })
-        return quote.action_request_quote()
+        # SEC-B 133: this is the public calculator path: short timeout.
+        return quote.with_context(
+            arc_dhl_timeout=WEB_TIMEOUT
+        ).action_request_quote()
 
     def _arc_dhl_quote_cache_key(self):
-        """Build a deterministic cache key from the quote inputs."""
+        """Build a deterministic cache key from the quote inputs.
+
+        SEC-B 124: sha1 of a canonical JSON key (hash() is seeded per process)
+        that includes the package dimensions. SEC-B 133: inputs are
+        normalised (zip without spaces, weight to 0.1 kg, dimensions up to
+        whole cm) so that trivial variation does not bypass the cache.
+        """
         self.ensure_one()
         if self.sale_order_id:
             order = self.sale_order_id
             partner = order.partner_shipping_id or order.partner_id
             packages = self._arc_dhl_collect_packages_from_order()
-            parts = [
-                str(self.product_id.id),
-                partner.country_id.code or 'SE',
-                partner.zip or '',
-                str(round(order.arc_chargeable_weight_kg or 0.0, 2)),
-                str(int(order.arc_package_count or 0)),
-            ]
+            country = partner.country_id.code or 'SE'
+            zip_code = partner.zip or ''
+            total_weight = order.arc_chargeable_weight_kg or 0.0
+            count = int(order.arc_package_count or 0)
         else:
             packages = self._arc_dhl_collect_packages_from_json()
-            parts = [
-                str(self.product_id.id),
-                self.partner_country_code or 'SE',
-                self.partner_zip or '',
-                str(round(sum(p['weight'] for p in packages), 2)),
-                str(len(packages)),
-            ]
-        return hash(tuple(parts))
+            country = self.partner_country_code or 'SE'
+            zip_code = self.partner_zip or ''
+            total_weight = sum(p.get('weight', 0.0) for p in packages)
+            count = len(packages)
+
+        def _cm(value):
+            try:
+                return math.ceil(round(float(value or 0.0), 3))
+            except (TypeError, ValueError):
+                return 0
+
+        def _kg(value):
+            try:
+                return round(float(value or 0.0), 1)
+            except (TypeError, ValueError):
+                return 0.0
+
+        pieces = sorted(
+            (
+                _cm(p.get('length')), _cm(p.get('width')),
+                _cm(p.get('height')), _kg(p.get('weight')),
+                bool(p.get('stackable', True)),
+            )
+            for p in packages
+        )
+        key = {
+            'product': self.product_id.id,
+            'country': country.upper(),
+            'zip': re.sub(r'\s+', '', zip_code).upper(),
+            'weight': _kg(total_weight),
+            'count': count,
+            'pieces': pieces,
+        }
+        canonical = json.dumps(key, sort_keys=True, separators=(',', ':'))
+        return hashlib.sha1(canonical.encode('utf-8')).hexdigest()
 
     def _cache_ttl(self):
         """Return quote cache time-to-live as a timedelta."""

@@ -1150,3 +1150,39 @@ msgid ""
 "When checked, requests go to the production DHL endpoint. Leave unchecked to"
 " use the sandbox."
 msgstr ""
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_price_quote.py:0
+msgid "DHL returned no usable price for this shipment."
+msgstr "DHL returnerade inget användbart pris för sändningen."
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid ""
+"This DHL booking is being processed by someone else. Wait a moment and check "
+"the booking before trying again."
+msgstr ""
+"Den här DHL-bokningen behandlas just nu av någon annan. Vänta en stund och "
+"kontrollera bokningen innan du försöker igen."
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid ""
+"This picking already has a booked DHL shipment. Cancel it at DHL before "
+"booking again."
+msgstr ""
+"Plockningen har redan en bokad DHL-sändning. Avboka den hos DHL innan du "
+"bokar igen."
+
+#. module: arc_delivery_dhl
+#. odoo-python
+#: code:addons/arc_delivery_dhl/models/arc_dhl_booking.py:0
+msgid ""
+"Booking %(name)s already exists at DHL (%(id)s) and cannot be reset to "
+"draft. Cancel it at DHL first."
+msgstr ""
+"Bokning %(name)s finns redan hos DHL (%(id)s) och kan inte återställas till "
+"utkast. Avboka den hos DHL först."

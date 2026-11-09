@@ -132,6 +132,8 @@ class ArcDhlPriceQuote(models.Model):
                 'price': existing.price,
                 'price_incl_vat': existing.price_incl_vat,
                 'vat_amount': existing.vat_amount,
+                # SEC-B 128: callers convert to the order's currency.
+                'currency_id': existing.currency_id.id,
                 'warning_message': False,
             }
 
@@ -190,6 +192,8 @@ class ArcDhlPriceQuote(models.Model):
             'price': price,
             'price_incl_vat': price_incl_vat,
             'vat_amount': vat_amount,
+            # SEC-B 128: callers convert to the order's currency.
+            'currency_id': self.currency_id.id,
             'warning_message': False,
         }
 

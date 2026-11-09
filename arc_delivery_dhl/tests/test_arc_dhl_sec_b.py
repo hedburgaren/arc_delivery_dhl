@@ -430,3 +430,36 @@ class TestArcDhlSecB(TransactionCase):
             module.migrate(self.env.cr, '18.0.1.4.0')
             data.invalidate_recordset(['noupdate'])
             self.assertTrue(data.noupdate, stage)
+
+    def test_128_web_adapter_returns_the_orders_currency(self):
+        # Chrille 2026-11-09: EUR orders get EUR freight, also on the web path.
+        Adapter = self.env['arc.dhl.visualcutter.adapter']
+        sek = self.env.company.currency_id
+        eur = self.env.ref('base.EUR')
+        eur.active = True
+        if sek == eur:
+            self.skipTest('company currency is EUR')
+        today = fields.Date.context_today(Adapter)
+        Rate = self.env['res.currency.rate']
+        rate = Rate.search([('currency_id', '=', eur.id), ('name', '=', today),
+                            ('company_id', '=', self.env.company.id)], limit=1)
+        if rate:
+            rate.rate = 0.087
+        else:
+            Rate.create({'currency_id': eur.id, 'rate': 0.087, 'name': today,
+                         'company_id': self.env.company.id})
+        batch = {'format': 'plate', 'cut_weight_kg': 5.0, 'source_length': 1000,
+                 'source_width': 500, 'source_thickness': 10}
+        result = {'success': True, 'price': 800.0, 'currency_id': sek.id}
+        Quote = type(self.env['arc.dhl.price.quote'])
+        with patch.object(Quote, 'get_quote_for_packages', return_value=result):
+            in_company = Adapter.quote_for_batch(batch, {'country_code': 'SE', 'zip': '58273'})
+            in_eur = Adapter.quote_for_batch(
+                batch, {'country_code': 'SE', 'zip': '58273', 'currency_id': eur.id})
+        self.assertEqual(in_company['currency'], sek.name)
+        self.assertEqual(in_company['shipping_fee'], 1000.0)
+        self.assertEqual(in_eur['currency'], 'EUR')
+        expected = round(sek._convert(800.0, eur, self.env.company,
+                                      fields.Date.context_today(Adapter)) / 0.8, 2)
+        self.assertAlmostEqual(in_eur['shipping_fee'], expected, places=2)
+        self.assertNotEqual(in_eur['shipping_fee'], 1000.0)

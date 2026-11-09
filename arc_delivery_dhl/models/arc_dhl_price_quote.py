@@ -463,26 +463,26 @@ class ArcDhlPriceQuote(models.Model):
         return payload
 
     def _arc_dhl_collect_packages_from_order(self):
-        """Collect packages from the linked sale order's proposal."""
+        """Collect packages from the linked sale order.
+
+        SEC-C 136: the collection itself lives in the shared collector
+        (arc.dhl.product.selector); only the schema rename to the payload
+        keys (length/width/height/weight) happens here.
+        """
         self.ensure_one()
         order = self.sale_order_id
-        packages = []
-        proposal = self.env['arc.package.proposal'].search([
-            ('sale_order_id', '=', order.id),
-            ('state', 'in', ('draft', 'confirmed')),
-        ], limit=1, order='create_date desc')
-        if proposal:
-            for line in proposal.line_ids:
-                for _i in range(line.package_qty):
-                    packages.append({
-                        'length': max(line.goods_L_mm or 1, 1) / 10.0,
-                        'width': max(line.goods_B_mm or 1, 1) / 10.0,
-                        'height': max(line.goods_H_mm or 1, 1) / 10.0,
-                        'weight': line.chargeable_weight_kg
-                                  / max(line.package_qty, 1),
-                        'stackable': line.stackable,
-                    })
-        return packages
+        packages = self.env['arc.dhl.product.selector'] \
+            .collect_packages_for_order(order)
+        return [
+            {
+                'length': p['length_cm'],
+                'width': p['width_cm'],
+                'height': p['height_cm'],
+                'weight': p['weight_kg'],
+                'stackable': p.get('stackable', True),
+            }
+            for p in packages
+        ]
 
     def _arc_dhl_collect_packages_from_json(self):
         """Collect packages from the stored package_json field."""

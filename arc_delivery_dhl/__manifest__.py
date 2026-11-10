@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ARC Delivery DHL',
-    # SEC-B 2026-11-09: security and robustness fixes (121-138), see docs/knowledge.
-    'version': '18.0.1.5.0',
+    # SEC-C 2026-11-09: low-severity security fixes (126-139), see docs/knowledge.
+    'version': '18.0.1.5.1',
     'author': 'ARC Gruppen AB',
     'maintainer': 'Chrille Hedberg',
     'maintainer_email': 'chrille.hedberg@arcgruppen.se',
@@ -40,6 +40,7 @@ authenticate with a Client-Key header.
         'data/arc_dhl_product_rule_data.xml',
         'data/arc_dhl_parameter_data.xml',
         'data/arc_dhl_customer_delivery_cron.xml',  # task 426
+        'data/arc_dhl_quote_purge_cron.xml',  # SEC-C 132
         'views/delivery_carrier_views.xml',
         'views/res_config_settings_views.xml',
         'views/stock_picking_views.xml',

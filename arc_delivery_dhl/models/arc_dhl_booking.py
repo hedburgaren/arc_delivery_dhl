@@ -255,40 +255,13 @@ class ArcDhlBooking(models.Model):
     def _arc_dhl_collect_packages(self, picking):
         """Collect package data from the picking.
 
-        Prefers WP2 package structure (arc.package.proposal), falls back to
-        native stock.quant.package records.
+        SEC-C 136: this is the module's shared package collector
+        (arc.dhl.product.selector), used by booking, product selection and
+        price quoting alike, so every path weighs the same packages the same
+        way.
         """
-        packages = []
-        proposal = self.env['arc.package.proposal'].search([
-            ('sale_order_id', '=', picking.sale_id.id),
-            ('state', '=', 'confirmed'),
-        ], limit=1, order='create_date desc')
-
-        if proposal:
-            for line in proposal.line_ids:
-                for _i in range(line.package_qty):
-                    packages.append({
-                        'length_cm': max(line.goods_L_mm or 1, 1) / 10.0,
-                        'width_cm': max(line.goods_B_mm or 1, 1) / 10.0,
-                        'height_cm': max(line.goods_H_mm or 1, 1) / 10.0,
-                        'weight_kg': line.chargeable_weight_kg
-                                     / max(line.package_qty, 1),
-                        'stackable': line.stackable,
-                    })
-            return packages
-
-        # Native package fallback.
-        for package in picking.move_line_ids.mapped('result_package_id'):
-            package.ensure_one()
-            pt = package.package_type_id
-            packages.append({
-                'length_cm': (pt.length or 1) / 10.0,
-                'width_cm': (pt.width or 1) / 10.0,
-                'height_cm': (pt.height or 1) / 10.0,
-                'weight_kg': package.weight or 1.0,
-                'stackable': True,
-            })
-        return packages
+        return self.env['arc.dhl.product.selector'].collect_packages_for_picking(
+            picking)
 
     def _arc_dhl_validate_packages(self, packages, product):
         """Raise if packages violate published DHL limits."""

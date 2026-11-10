@@ -4,7 +4,7 @@
 
 `arc_delivery_dhl` is the DHL Freight Sweden delivery carrier integration for the ARC Industrial Suite (Odoo 18 CE). It adds a `delivery.carrier` implementation (`delivery_type='dhl_freight_se'`) and supporting models for product selection, price quotes, shipment booking and label retrieval.
 
-Module version: `__manifest__.py:4` (`18.0.1.5.0`).
+Module version: `__manifest__.py:4` (`18.0.1.5.1`).
 Depends on `arc_industrial_ops`, `delivery`, `stock` and `mail`.
 
 ## API: Swedish DHL Freight API Farm
@@ -67,6 +67,9 @@ Key fields: `name`, `carrier_id`, `sale_order_id`, `product_id`, `partner_countr
 Key methods:
 - `action_request_quote()` : cache lookup, then DHL Price Quote API call. `models/arc_dhl_price_quote.py:72`.
 - `get_quote_for_packages(packages, partner_vals, product=None)` : model helper used by VisualCutter. `models/arc_dhl_price_quote.py:128`.
+- `_arc_dhl_purge_old_quotes()` : deletes quotes older than `arc_delivery_dhl.quote_retention_days` (default 30), run by the daily purge cron. SEC-C 132.
+
+Caching (SEC-C 132): a cache hit reuses the cached record. The freshly created record is removed and the result carries `quote_id` pointing at the cached one; `sale.order.action_arc_dhl_quote()` links the order to `quote_id`, not to the removed record.
 - `_arc_dhl_build_quote_payload()` : builds the DHL Freight Price Quote request including `eid`, `shipment`, `piece[]`, `parties[]` and `ownSurCharge`. `models/arc_dhl_price_quote.py:210`.
 - `_arc_dhl_extract_price(response)` : returns the `TotalPrice` line from the list response. `models/arc_dhl_price_quote.py:345`.
 
@@ -115,6 +118,8 @@ Environment fallbacks:
 - `data/arc_dhl_product_data.xml` - seed DHL products.
 - `data/arc_dhl_product_rule_data.xml` - seed product selection rules.
 - `data/arc_dhl_parameter_data.xml` - default config parameters (the sandbox/production switch; 18.0.1.3.1, task 191, removed the seeded `arc_delivery_dhl.request_timeout` 30: nothing read it, the live timeout is the `DEFAULT_TIMEOUT` constant in `models/arc_dhl_request_mixin.py`).
+- `data/arc_dhl_quote_purge_cron.xml` - daily cron that removes price quotes older than `arc_delivery_dhl.quote_retention_days` (default 30 days), added in SEC-C 132. An order whose linked quote is purged loses the reference and its DHL cost figures.
+- `data/arc_dhl_product_rule_data.xml` - seed product selection rules. The old catch-all rule (product SPECIAL, code 209) is removed in SEC-C 127: 209 has no PriceQuote API enum value, so anything it matched could never be priced. Migration `18.0.1.5.1` deactivates the row on existing databases (the file is noupdate, so a plain update does not remove it).
 - `migrations/18.0.1.1.0/` and `migrations/18.0.1.2.0/` - historical migrations.
 - `migrations/18.0.1.3.1/post-migration.py` - task 191: exports the old `arc_delivery_dhl.request_timeout` row (key and value) to `/var/log/odoo/task191-dead-settings/` and then deletes it; the seed row was `noupdate=1`, so it would otherwise survive the upgrade.
 
@@ -181,3 +186,15 @@ Tests: `tests/test_arc_dhl_sec_b.py` and `test_121` in `tests/test_arc_dhl_reque
 - **133 public calculator**: inside this module only: the cache key normalises zip (no spaces, upper case), weight (0.1 kg) and dimensions (whole cm up), and the public path (`get_quote_for_packages`) uses a 10 s timeout (`WEB_TIMEOUT`, context key `arc_dhl_timeout`) instead of 30 s. The rate limit for anonymous callers belongs in the core module.
 - **135 booking price**: not changed. No price field appears in the known TransportInstruction response (code and tests), so `booking.price` stays 0 until the real response format is known.
 - **138 quote access**: `base.group_user` has read-only access to `arc.dhl.price.quote`. The module creates and writes quotes through `sudo()` (`sale.order.action_arc_dhl_quote`, `delivery.carrier.dhl_freight_se_rate_shipment`, `get_quote_for_packages`, `action_request_quote`). Any other code that creates quotes as a non-admin user must do the same.
+
+## SEC-C low-severity fixes (18.0.1.5.1, 2026-11-09)
+
+Tests: `tests/test_secc_*.py`. Numbers are the audit finding ids.
+
+- **126 booking product**: `delivery.carrier.dhl_freight_se_send_shipping()` resolves the DHL product per picking (carrier field first, then `arc.dhl.product.selector.select_for_picking`) and raises a UserError when no rule matches, instead of creating a booking with no product. The booking model's own `if not product` fallback remains as a safety net.
+- **127 unmapped code**: `_arc_dhl_build_quote_payload()` can raise `ValueError` for a product code with no PriceQuote enum mapping; `action_request_quote()` catches it and reports a failed quote (state `error`) like any other error, instead of crashing outside the try block. The catch-all rule SPECIAL (code 209) is removed from the seed data and deactivated by migration `18.0.1.5.1`, since 209 has no enum mapping and could never be priced.
+- **132 quote growth**: a cache hit no longer writes a duplicate row; the fresh record is unlinked and the result names the cached record via `quote_id` (`sale.order.action_arc_dhl_quote()` links the order to `quote_id`). A daily cron (`data/arc_dhl_quote_purge_cron.xml`) deletes quotes older than `arc_delivery_dhl.quote_retention_days` (default 30 days).
+- **134 adapter flag**: `arc.dhl.visualcutter.adapter.quote_for_batch()` results carry `success` (True when priced, False on every fallback path). The zero `shipping_fee` in a fallback is a placeholder, never a free-shipment statement. The caller in `arc_industrial_core` is unchanged and still reads the reason string; it can start refusing on `success: False` whenever core is touched (core is SEC-A's module).
+- **136 shared collector**: `arc.dhl.product.selector.collect_packages_for_order()` / `collect_packages_for_picking()` are the only package collectors (newest draft or confirmed proposal, else native packages, cm/kg with `stackable`). Booking, product selection and price quoting all use them. Behaviour change: booking now accepts a draft proposal like the price paths. Cache keys are unchanged by this: `stackable` was already part of the key since 124 (SEC-B), and the price paths' inputs are byte-identical, so existing cache rows stay valid (verifier finding, corrected 2026-11-09).
+- **137 sale.order fixture**: fixed in the base (carrier and FRAKT product created in the test setup), verified green by the staging suite; no module change.
+- **139 rate fail closed**: `dhl_freight_se_rate_shipment()` downgrades a result with price <= 0 to `success: False` at the carrier boundary, on top of the quote-level guard from SEC-B 122.

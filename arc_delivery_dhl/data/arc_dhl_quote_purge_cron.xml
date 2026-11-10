@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- SEC-C 132: the quote table grows with every rate call; a daily cron
+         removes records past arc_delivery_dhl.quote_retention_days (30). -->
+    <record id="ir_cron_purge_price_quotes" model="ir.cron">
+        <field name="name">DHL Freight: purge old price quotes</field>
+        <field name="model_id" ref="model_arc_dhl_price_quote"/>
+        <field name="state">code</field>
+        <field name="code">model._arc_dhl_purge_old_quotes()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

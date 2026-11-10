@@ -119,15 +119,10 @@ class ArcDhlPriceQuote(models.Model):
         ], limit=1, order='create_date desc')
         if existing:
             _logger.info('DHL price quote cache hit for key %s', cache_key)
-            self.write({
-                'state': 'quoted',
-                'price': existing.price,
-                'price_incl_vat': existing.price_incl_vat,
-                'vat_amount': existing.vat_amount,
-                'currency_id': existing.currency_id.id,
-                'cache_key': cache_key,
-            })
-            return {
+            # SEC-C 132: a cache hit reuses the cached record instead of
+            # writing a duplicate row; the fresh record is removed and the
+            # result points at the cached one via quote_id.
+            result = {
                 'success': True,
                 'price': existing.price,
                 'price_incl_vat': existing.price_incl_vat,
@@ -135,9 +130,28 @@ class ArcDhlPriceQuote(models.Model):
                 # SEC-B 128: callers convert to the order's currency.
                 'currency_id': existing.currency_id.id,
                 'warning_message': False,
+                'quote_id': existing.id,
+            }
+            self.unlink()
+            return result
+
+        # SEC-C 127: an unmapped product code raises ValueError inside the
+        # payload builder. That is a configuration error, not a crash: it is
+        # reported as a failed quote like any other DHL error.
+        try:
+            payload = self._arc_dhl_build_quote_payload()
+        except ValueError as exc:
+            self.write({
+                'state': 'error',
+                'error_message': str(exc),
+                'cache_key': cache_key,
+            })
+            return {
+                'success': False,
+                'price': 0.0,
+                'error_message': str(exc),
             }
 
-        payload = self._arc_dhl_build_quote_payload()
         try:
             response = self.env['arc.dhl.request.mixin']._arc_dhl_request(
                 'post',
@@ -195,6 +209,7 @@ class ArcDhlPriceQuote(models.Model):
             # SEC-B 128: callers convert to the order's currency.
             'currency_id': self.currency_id.id,
             'warning_message': False,
+            'quote_id': self.id,
         }
 
     @api.model
@@ -313,6 +328,29 @@ class ArcDhlPriceQuote(models.Model):
         )
         return timedelta(hours=hours)
 
+    # SEC-C 132 ----------------------------------------------------------
+
+    def _arc_dhl_purge_old_quotes(self):
+        """Delete price quotes older than the retention window.
+
+        The quote table grows with every rate call. A daily cron removes
+        records past ``arc_delivery_dhl.quote_retention_days`` (default 30).
+        Orders that still link a purged quote lose the reference; the cost
+        figures on the order are historical anyway.
+        """
+        days = int(
+            self.env['ir.config_parameter'].sudo().get_param(
+                'arc_delivery_dhl.quote_retention_days', '30'
+            )
+        )
+        cutoff = fields.Datetime.now() - timedelta(days=days)
+        stale = self.sudo().search([('create_date', '<', cutoff)])
+        count = len(stale)
+        if count:
+            stale.unlink()
+        _logger.info('DHL price quote purge removed %s records.', count)
+        return count
+
     def _arc_dhl_price_quote_product_code(self):
         """Return the PriceQuote API enum value for the selected product."""
         self.ensure_one()
@@ -425,26 +463,26 @@ class ArcDhlPriceQuote(models.Model):
         return payload
 
     def _arc_dhl_collect_packages_from_order(self):
-        """Collect packages from the linked sale order's proposal."""
+        """Collect packages from the linked sale order.
+
+        SEC-C 136: the collection itself lives in the shared collector
+        (arc.dhl.product.selector); only the schema rename to the payload
+        keys (length/width/height/weight) happens here.
+        """
         self.ensure_one()
         order = self.sale_order_id
-        packages = []
-        proposal = self.env['arc.package.proposal'].search([
-            ('sale_order_id', '=', order.id),
-            ('state', 'in', ('draft', 'confirmed')),
-        ], limit=1, order='create_date desc')
-        if proposal:
-            for line in proposal.line_ids:
-                for _i in range(line.package_qty):
-                    packages.append({
-                        'length': max(line.goods_L_mm or 1, 1) / 10.0,
-                        'width': max(line.goods_B_mm or 1, 1) / 10.0,
-                        'height': max(line.goods_H_mm or 1, 1) / 10.0,
-                        'weight': line.chargeable_weight_kg
-                                  / max(line.package_qty, 1),
-                        'stackable': line.stackable,
-                    })
-        return packages
+        packages = self.env['arc.dhl.product.selector'] \
+            .collect_packages_for_order(order)
+        return [
+            {
+                'length': p['length_cm'],
+                'width': p['width_cm'],
+                'height': p['height_cm'],
+                'weight': p['weight_kg'],
+                'stackable': p.get('stackable', True),
+            }
+            for p in packages
+        ]
 
     def _arc_dhl_collect_packages_from_json(self):
         """Collect packages from the stored package_json field."""

@@ -28,8 +28,11 @@ class ArcDhlVisualCutterAdapter(models.AbstractModel):
             id). The fee is returned in that currency, else in the company
             currency (Chrille 2026-11-09, SEC-B 128: EUR orders get EUR
             freight).
-        :return: dict with ``shipping_fee``, ``shipping_info``,
+        :return: dict with ``success``, ``shipping_fee``, ``shipping_info``,
                  ``packaging_fee``, ``packaging_info`` and ``currency`` keys.
+                 SEC-C 134: ``success`` is False and ``shipping_fee`` 0.0 when
+                 no fee could be determined, so a caller can never read the
+                 zero as a free shipment.
         """
         packages = self._batch_to_packages(batch_result)
         if not packages:
@@ -49,6 +52,7 @@ class ArcDhlVisualCutterAdapter(models.AbstractModel):
             quote_result.get('price', 0.0), quote_result.get('currency_id'), target)
         shipping_fee = round(cost / 0.8, 2)
         return {
+            'success': True,
             'shipping_fee': shipping_fee,
             'currency': target.name,
             'shipping_info': {
@@ -112,8 +116,14 @@ class ArcDhlVisualCutterAdapter(models.AbstractModel):
 
     @api.model
     def _fallback_result(self, reason):
-        """Return a fail-open result when DHL quoting is not possible."""
+        """Return an explicit failure result when DHL quoting is not possible.
+
+        SEC-C 134: the shape is unchanged, but ``success`` now says plainly
+        that no fee was determined. The zero fee is a placeholder for callers
+        that only read the amount, never a statement that shipping is free.
+        """
         return {
+            'success': False,
             'shipping_fee': 0.0,
             'shipping_info': {'reason': reason},
             'packaging_fee': 0.0,

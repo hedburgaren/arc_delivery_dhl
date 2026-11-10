@@ -55,9 +55,13 @@ class DeliveryCarrier(models.Model):
             'product_id': product.id,
         })
         result = quote.action_request_quote()
+        # SEC-C 139: a missing or zero price is never a successful rate, even
+        # if an upstream path ever reports success with price 0.
+        price = result.get('price', 0.0)
+        success = bool(result.get('success', False)) and price > 0
         return {
-            'success': result.get('success', False),
-            'price': result.get('price', 0.0),
+            'success': success,
+            'price': price,
             'error_message': result.get('error_message', False),
             'warning_message': result.get('warning_message', False),
         }
@@ -75,10 +79,21 @@ class DeliveryCarrier(models.Model):
             ))
         res = []
         for picking in pickings:
+            # SEC-C 126: a carrier without a DHL product falls back to the
+            # selector instead of creating a booking with no product.
+            product = self.arc_dhl_product_id
+            if not product:
+                product = self.env['arc.dhl.product.selector'].select_for_picking(picking)
+            if not product:
+                raise UserError(_(
+                    'No DHL product for picking %(picking)s. Set a DHL product '
+                    'on the carrier or check the packing proposal.',
+                    picking=picking.name,
+                ))
             booking = self.env['arc.dhl.booking'].create({
                 'carrier_id': self.id,
                 'picking_id': picking.id,
-                'product_id': self.arc_dhl_product_id.id,
+                'product_id': product.id,
             })
             result = booking.action_book_shipment()
             if not result.get('success'):

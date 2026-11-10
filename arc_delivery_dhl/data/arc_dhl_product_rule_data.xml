@@ -74,15 +74,11 @@
         <field name="product_id" ref="arc_delivery_dhl.dhl_product_road_priority"/>
     </record>
 
-    <record id="dhl_product_rule_special" model="arc.dhl.product.rule">
-        <field name="name">DHL SPECIAL</field>
-        <field name="sequence">100</field>
-        <field name="is_domestic" eval="True"/>
-        <field name="is_international" eval="True"/>
-        <field name="max_length_cm">0</field>
-        <field name="max_weight_kg">0</field>
-        <field name="max_package_count">0</field>
-        <field name="product_id" ref="arc_delivery_dhl.dhl_product_special"/>
-        <field name="note">Catch-all for anything outside standard products. Requires agreement.</field>
-    </record>
+    <!-- SEC-C 127: the old catch-all rule (product SPECIAL, code 209) is
+         removed. 209 has no PriceQuote API enum value, so any shipment it
+         matched could never be priced; it only turned a clean "no rule
+         matches" error into a late, misleading failure. Shipments outside
+         the standard products must get a manually calibrated rule or an
+         explicit "no rule" answer. Migration 18.0.1.5.1 deactivates the
+         record on existing databases. -->
 </odoo>
